@@ -1,0 +1,21 @@
+Versión de Flutter: 3.35.0
+
+Arquitectura: Por capas porque es fácil de mantener y entender, es escalable, separa las responsabilidades de forma clara
+Patrón de diseño: Repository por su simplicidad, forma de separar las reglas de negocio, llamadas fáciles desde cualquier clase
+
+Se tienen tres capas:
+ 1. Presentation (UI)
+ 2. Domain (Reglas de negocio)
+ 3. Data (Implementación)
+
+Además se tiene el folder core para cosas generales como estilos que se usen repetidamente en la app
+
+Por que en data se guardan las implementaciones a interfaces:
+ - Porque se define COMO se quiere hacer (técnico)
+
+Por que en domain se guardan las interfaces:
+ - Porque se define QUE se quiere hacer (reglas de negocio)
+
+Para ejecutar app se puede con emulador de android
+O mas sencillo activando "depuración USB" en configuraciones de desarrollador de celular físico y activando "instalar vía USB"
+Al aceptar eso saldrá su dispositivo en los dispositivos conectados para debug
