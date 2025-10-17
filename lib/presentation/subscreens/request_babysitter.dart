@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -108,9 +110,34 @@ class _RequestBabysitterScreenState extends State<RequestBabysitterScreen> {
           markerId: MarkerId('currentLocation'),
           position: _currentLocation,
           infoWindow: InfoWindow(
-            title: 'Ubicación Actual',
+            title: 'Ubicación del servicio',
+            snippet: 'Ubicación actual',
           ),
         ),
+      );
+    });
+  }
+
+  void _updateLocationOnMap(LatLng newLatLng) {
+    setState(() {
+      _currentLocation = newLatLng;
+
+      // Se quita el marcador anterior
+      _markers.clear(); 
+
+      _markers.add(
+        Marker(
+          markerId: MarkerId('serviceLocation'),
+          position: _currentLocation,
+          infoWindow: InfoWindow(
+            title: 'Ubicación del servicio',
+            snippet: 'Ubicación seleccionada',
+          ),
+        ),
+      );
+
+      _mapController.animateCamera(
+        CameraUpdate.newLatLng(_currentLocation),
       );
     });
   }
@@ -293,7 +320,7 @@ class _RequestBabysitterScreenState extends State<RequestBabysitterScreen> {
             ),
             const SizedBox(height: 20),
 
-            Text("Seleccionar ubicación donde se cuidará a sus hijos (por defecto está seleccionada su ubicación actual):", style: AppTextstyles.bodyText),
+            Text("Seleccionar ubicación donde se cuidará a sus hijos:\n(Latitud): ${_currentLocation.latitude}\n(Longitud): ${_currentLocation.longitude}", style: AppTextstyles.bodyText),
             const SizedBox(height: 8),
             Container(
               decoration: BoxDecoration(
@@ -303,14 +330,20 @@ class _RequestBabysitterScreenState extends State<RequestBabysitterScreen> {
               width: double.infinity,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(15),
-                // HACER que se pueda mover facilmente al desplazarse por el mapa
-                // HACER que se pueda ingresar la nueva ubicacion donde se van a cuidar los niños al hacer doble click
-                // con un set state 
                 child: GoogleMap(
                   initialCameraPosition: CameraPosition(target: _currentLocation, zoom: 17),
                   markers: _markers,
                   onMapCreated: (GoogleMapController controller) {
                     _mapController = controller;
+                  },
+
+                  // Para cuando se deje presionado se asigne una nueva ubicación
+                  onLongPress: _updateLocationOnMap,
+                  
+                  gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+                    Factory<OneSequenceGestureRecognizer>(() => EagerGestureRecognizer()),
+                    Factory<PanGestureRecognizer>(() => PanGestureRecognizer()),
+                    Factory<ScaleGestureRecognizer>(() => ScaleGestureRecognizer()),
                   },
                 ),
               ),
