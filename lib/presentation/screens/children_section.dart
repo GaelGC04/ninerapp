@@ -125,7 +125,7 @@ class _ChildrenSectionState extends State<ChildrenSection> {
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => ChildFormScreen(onSave: () {_loadChildren();}),
+                    builder: (context) => ChildFormScreen(onSave: () {_loadChildren();}, parent: widget.parent),
                   ),
                 );
               },

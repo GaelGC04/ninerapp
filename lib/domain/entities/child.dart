@@ -1,6 +1,7 @@
 import 'package:ninerapp/domain/entities/person.dart';
 
 class Child extends Person {
+  final int parentId;
   final bool physicalDisability;
   final bool hearingDisability;
   final bool visualDisability;
@@ -12,6 +13,7 @@ class Child extends Person {
     required super.lastName,
     required super.birthdate,
     required super.isFemale,
+    required this.parentId,
     required this.physicalDisability,
     required this.hearingDisability,
     required this.visualDisability,
@@ -25,6 +27,7 @@ class Child extends Person {
       lastName: map['last_name'] as String,
       birthdate: DateTime.parse(map['birthdate'] as String),
       isFemale: map['is_female'] as bool,
+      parentId: map['parent_id'] as int,
       physicalDisability: map['physical_disability'] as bool,
       hearingDisability: map['hearing_disability'] as bool,
       visualDisability: map['visual_disability'] as bool,
@@ -35,6 +38,7 @@ class Child extends Person {
   @override
   Map<String, dynamic> toMap() {
     return super.toMap()..addAll({
+      'parent_id': parentId,
       'physical_disability': physicalDisability,
       'hearing_disability': hearingDisability,
       'visual_disability': visualDisability,

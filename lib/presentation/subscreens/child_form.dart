@@ -6,16 +6,19 @@ import 'package:ninerapp/core/constants/app_textstyles.dart';
 import 'package:ninerapp/core/util/time_number_format.dart';
 import 'package:ninerapp/dependency_inyection.dart';
 import 'package:ninerapp/domain/entities/child.dart';
+import 'package:ninerapp/domain/entities/parent.dart';
 import 'package:ninerapp/domain/repositories/ichild_repository.dart';
 import 'package:ninerapp/presentation/widgets/app_button.dart';
 import 'package:ninerapp/presentation/widgets/app_text_field.dart';
 
 class ChildFormScreen extends StatefulWidget {
+  final Parent parent;
   final VoidCallback onSave;
 
   const ChildFormScreen({
     super.key,
     required this.onSave,
+    required this.parent
   });
 
   @override
@@ -204,6 +207,7 @@ class _ChildFormScreenState extends State<ChildFormScreen> {
                         lastName: newLastName,
                         birthdate: newBirthdate,
                         isFemale: newIsFemale,
+                        parentId: widget.parent.id!,
                         physicalDisability: newDisabilityFisica,
                         hearingDisability: newDisabilityAuditiva,
                         visualDisability: newDisabilityVisual,
