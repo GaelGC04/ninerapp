@@ -191,7 +191,7 @@ class _ChildFormScreenState extends State<ChildFormScreen> {
 
                     final String newName = _nameController.text.trim();
                     final String newLastName = _lastNameController.text.trim();
-                    final DateTime? newBirthdate = DateFormat('dd-MM-yyyy').parse(_birthdateText.trim());
+                    final DateTime newBirthdate = DateFormat('dd-MM-yyyy').parse(_birthdateText.trim());
                     final bool newIsFemale = _selectedGender == 'Mujer';
                     final bool newDisabilityFisica = _disabilityFisica;
                     final bool newDisabilityAuditiva = _disabilityAuditiva;

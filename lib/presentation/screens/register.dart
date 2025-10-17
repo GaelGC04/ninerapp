@@ -237,7 +237,7 @@ class _RegisterState extends State<Register> {
                   late Parent newParent;
                   late Babysitter newBabysitter;
                   bool notExists = true;
-                  if (await _babysitterRepository.getBabysitterByEmail(_emailController.text) != null || await _parentRepository.getParentByEmail(_emailController.text) != null) {
+                  if (await _babysitterRepository.getBabysitterByEmail(_emailController.text.trim()) != null || await _parentRepository.getParentByEmail(_emailController.text.trim()) != null) {
                     notExists = false;
                   }
 
@@ -251,21 +251,21 @@ class _RegisterState extends State<Register> {
                   if (_isParent == true) {
                     newParent = Parent(
                       password: Cipher.hashPassword(_passwordController.text),
-                      name: _nameController.text,
-                      lastName: _lastNameController.text,
+                      name: _nameController.text.trim(),
+                      lastName: _lastNameController.text.trim(),
                       birthdate: null,
-                      email: _emailController.text,
+                      email: _emailController.text.trim(),
                       isFemale: _isFemale,
                       stars: 0,
                     );
                   } else if (_isParent == false) {
                     newBabysitter = Babysitter(
                       password: Cipher.hashPassword(_passwordController.text),
-                      name: _nameController.text,
-                      lastName: _lastNameController.text,
+                      name: _nameController.text.trim(),
+                      lastName: _lastNameController.text.trim(),
                       birthdate: null,
                       isFemale: _isFemale,
-                      email: _emailController.text,
+                      email: _emailController.text.trim(),
                       pricePerHour: 0,
                       workStartYear: 0,
                       expPhysicalDisability: false,
