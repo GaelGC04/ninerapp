@@ -30,7 +30,7 @@ class Person {
     return {
       'name': name,
       'last_name': lastName,
-      'birthdate': birthdate ?? birthdate?.toIso8601String(),
+      'birthdate': birthdate?.toIso8601String(),
       'is_female': isFemale,
     };
   }
