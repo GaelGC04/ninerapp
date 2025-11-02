@@ -25,14 +25,14 @@ class ChildCard extends StatelessWidget {
     if (child.visualDisability) totalDisabilities++;
     if (child.otherDisabilities != null && child.otherDisabilities!.isNotEmpty) totalDisabilities++;
 
+    return showInfo(totalDisabilities);
+  }
+
+  Container showInfo(int totalDisabilities) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [AppShadows.inputShadow],
-      ),
+      decoration: BoxDecoration(color: AppColors.white, borderRadius: BorderRadius.circular(15), boxShadow: [AppShadows.inputShadow]),
       child: Row(
         children: [
           CircleAvatar(

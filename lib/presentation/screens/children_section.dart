@@ -101,19 +101,7 @@ class _ChildrenSectionState extends State<ChildrenSection> {
                   child: Column(
                     children: [
                       ...childrenList.map((child) {
-                        return ChildCard(
-                          child: child,
-                          onEdit: () {
-                          },
-                          onDelete: () {
-                            // HACER pedir confirmacion antes de eliminar hijo
-                            _childRepository.deleteChild(child.id!).then((_) {
-                              _loadChildren();
-                            }).catchError((e) {
-                              // HACER mostrar modal diciendo que ocurrio un error al borrar al hijo
-                            });
-                          },
-                        );
+                        return showChildCard(child);
                       }),
                     ],
                   ),
@@ -123,11 +111,7 @@ class _ChildrenSectionState extends State<ChildrenSection> {
             SizedBox(height: 10),
             AppButton(
               onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => ChildFormScreen(onSave: () {_loadChildren();}, parent: widget.parent),
-                  ),
-                );
+                _openNewChildScreen();
               },
               backgroundColor: AppColors.currentListOption,
               textColor: AppColors.white,
@@ -139,6 +123,34 @@ class _ChildrenSectionState extends State<ChildrenSection> {
           ],
         ),
       )
+    );
+  }
+
+  ChildCard showChildCard(Child child) {
+    return ChildCard(
+      child: child,
+      onEdit: () {
+      },
+      onDelete: () {
+        _deleteChild(child);
+      },
+    );
+  }
+
+  void _deleteChild(Child child) async {
+    // HACER pedir confirmacion antes de eliminar hijo
+    _childRepository.deleteChild(child.id!).then((_) {
+      _loadChildren();
+    }).catchError((e) {
+      // HACER mostrar modal diciendo que ocurrio un error al borrar al hijo
+    });
+  }
+
+  void _openNewChildScreen() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ChildFormScreen(onSave: () {_loadChildren();}, parent: widget.parent),
+      ),
     );
   }
 

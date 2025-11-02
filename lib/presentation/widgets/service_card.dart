@@ -39,43 +39,47 @@ class _ServiceCardState extends State<ServiceCard> {
           borderRadius: BorderRadius.circular(15),
           boxShadow: [AppShadows.inputShadow],
         ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Solicitud para: ${widget.service.babysitter.name.split(" ")[0]} ${widget.service.babysitter.lastName.split(" ")[0]}', style: AppTextstyles.childCardText, maxLines: 1, overflow: TextOverflow.ellipsis),
-                  Text('${widget.service.paymentWithCard == true ? 'Pago con tarjeta' : 'Pago con efectivo'}: \$${widget.service.totalPrice.toStringAsFixed(2)} mxn', style: AppTextstyles.childCardText, maxLines: 1, overflow: TextOverflow.ellipsis),
-                  SizedBox(height: 10),
-                  Text('FECHA: ${TimeNumberFormat.formatTwoDigits(widget.service.date.day)}/${TimeNumberFormat.getMonthName(widget.service.date.month)}/${widget.service.date.year} - ${widget.service.date.hour}:${widget.service.date.minute}', style: AppTextstyles.childCardText, maxLines: 1, overflow: TextOverflow.ellipsis),
-                  Text('${widget.service.hours} hora${widget.service.hours == 1 ? '' : 's'}, ${widget.service.minutes} minuto${widget.service.minutes == 1 ? '' : 's'}', style: AppTextstyles.childCardText, maxLines: 1, overflow: TextOverflow.ellipsis),
-                  SizedBox(height: 10),
-                  Text('ESTADO: ${widget.service.status}', style: AppTextstyles.childCardText.copyWith(color: AppColors.currentListOption), maxLines: 1, overflow: TextOverflow.ellipsis),
-                ],
-              ),
-            ),
-            if (widget.service.status == 'Esperando respuesta') ...[
-              SizedBox(width: 15),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  SizedBox(
-                    height: 35, width: 35,
-                    child: IconButton(
-                      icon: Icon(FontAwesomeIcons.circleXmark, color: AppColors.red, size: 20),
-                      onPressed: (){
-                        widget.onCancel();
-                        // HACER accion de abrir modal para cancelar en caso de que el estatus sea Esperando respuesta
-                      }, tooltip: "Cancelar servicio", hoverColor: AppColors.invisible, color: AppColors.invisible
-                    ),
-                  ),
-                ],
-              ),
-            ]
-          ],
-        ),
+        child: showInfo(),
       ),
+    );
+  }
+
+  Row showInfo() {
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Solicitud para: ${widget.service.babysitter.name.split(" ")[0]} ${widget.service.babysitter.lastName.split(" ")[0]}', style: AppTextstyles.childCardText, maxLines: 1, overflow: TextOverflow.ellipsis),
+              Text('${widget.service.paymentWithCard == true ? 'Pago con tarjeta' : 'Pago con efectivo'}: \$${widget.service.totalPrice.toStringAsFixed(2)} mxn', style: AppTextstyles.childCardText, maxLines: 1, overflow: TextOverflow.ellipsis),
+              SizedBox(height: 10),
+              Text('FECHA: ${TimeNumberFormat.formatTwoDigits(widget.service.date.day)}/${TimeNumberFormat.getMonthName(widget.service.date.month)}/${widget.service.date.year} - ${widget.service.date.hour}:${widget.service.date.minute}', style: AppTextstyles.childCardText, maxLines: 1, overflow: TextOverflow.ellipsis),
+              Text('${widget.service.hours} hora${widget.service.hours == 1 ? '' : 's'}, ${widget.service.minutes} minuto${widget.service.minutes == 1 ? '' : 's'}', style: AppTextstyles.childCardText, maxLines: 1, overflow: TextOverflow.ellipsis),
+              SizedBox(height: 10),
+              Text('ESTADO: ${widget.service.status}', style: AppTextstyles.childCardText.copyWith(color: AppColors.currentListOption), maxLines: 1, overflow: TextOverflow.ellipsis),
+            ],
+          ),
+        ),
+        if (widget.service.status == 'Esperando respuesta') ...[
+          SizedBox(width: 15),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              SizedBox(
+                height: 35, width: 35,
+                child: IconButton(
+                  icon: Icon(FontAwesomeIcons.circleXmark, color: AppColors.red, size: 20),
+                  onPressed: (){
+                    widget.onCancel();
+                    // HACER accion de abrir modal para cancelar en caso de que el estatus sea Esperando respuesta
+                  }, tooltip: "Cancelar servicio", hoverColor: AppColors.invisible, color: AppColors.invisible
+                ),
+              ),
+            ],
+          ),
+        ]
+      ],
     );
   }
 }

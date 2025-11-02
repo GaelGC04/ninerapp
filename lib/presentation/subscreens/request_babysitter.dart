@@ -293,11 +293,7 @@ class _RequestBabysitterScreenState extends State<RequestBabysitterScreen> {
                 Expanded(
                   child: RadioGroup<String>(
                     groupValue: _selectedPaymentMethod,
-                    onChanged: (String? value) {
-                      setState(() {
-                        _selectedPaymentMethod = value;
-                      });
-                    },
+                    onChanged: changePaymentMethod,
                     child: Column(
                       children: [
                         Row(
@@ -376,7 +372,7 @@ class _RequestBabysitterScreenState extends State<RequestBabysitterScreen> {
                   coloredBorder: true,
                 ),
                 AppButton(
-                  onPressed: () => requestServiceActionButton(),
+                  onPressed: _requestServiceAction,
                   backgroundColor: AppColors.currentSectionColor,
                   textColor: AppColors.white,
                   text: 'Contratar',
@@ -392,7 +388,13 @@ class _RequestBabysitterScreenState extends State<RequestBabysitterScreen> {
     );
   }
 
-  Future<void> requestServiceActionButton() async {
+  void changePaymentMethod(String? newMethod) {
+    setState(() {
+      _selectedPaymentMethod = newMethod;
+    });
+  }
+
+  Future<void> _requestServiceAction() async {
     setState(() {
       _addingService = true;
     });
@@ -400,14 +402,7 @@ class _RequestBabysitterScreenState extends State<RequestBabysitterScreen> {
     bool paymentSuccess = true;
 
     if (_selectedPaymentMethod == 'Tarjeta') {
-      try {
-        paymentSuccess = await StripeService.instance.makePayment((babysitter.pricePerHour * (int.parse(_hoursController.text) + (int.parse(_minutesController.text)/60))));
-      } catch (e) {
-        debugPrint(e.toString());
-      }
-      if (paymentSuccess == true) {
-        await Future.delayed(Duration(seconds: 1));
-      }
+      paymentSuccess = await makeStripePayment(paymentSuccess);
     }
 
     if (paymentSuccess == false) {
@@ -445,6 +440,18 @@ class _RequestBabysitterScreenState extends State<RequestBabysitterScreen> {
       Navigator.of(context).pop();
       widget.onRequest();
     });
+  }
+
+  Future<bool> makeStripePayment(bool paymentSuccess) async {
+    try {
+      paymentSuccess = await StripeService.instance.makePayment((babysitter.pricePerHour * (int.parse(_hoursController.text) + (int.parse(_minutesController.text)/60))));
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+    if (paymentSuccess == true) {
+      await Future.delayed(Duration(seconds: 1));
+    }
+    return paymentSuccess;
   }
 
   Row timeRequestedForms() {

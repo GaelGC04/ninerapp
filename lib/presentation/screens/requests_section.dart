@@ -35,15 +35,15 @@ class _RequestsSectionState extends State<RequestsSection> {
     _loadServices(false);
   }
 
-  Future<void> _loadServices(bool isFinished) async {
+  Future<void> _loadServices(bool areFinished) async {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
-      _showingFinishedServices = isFinished;
+      _showingFinishedServices = areFinished;
     });
 
     try {
-      final servicesRes = await _serviceRepository.getServicesByParentId(widget.parent.id!, isFinished);
+      final servicesRes = await _serviceRepository.getServicesByParentId(widget.parent.id!, areFinished);
       setState(() {
         servicesList = servicesRes;
 
@@ -93,10 +93,7 @@ class _RequestsSectionState extends State<RequestsSection> {
                     children: [
                       SizedBox(height: 10),
                       ...servicesList.map((service) {
-                        return ServiceCard(
-                          service: service,
-                          onCancel: () => onCancelAction(service.id!, ServiceStatus.canceled.value),
-                        );
+                        return showServiceCard(service);
                       }),
                     ],
                   ),
@@ -119,6 +116,13 @@ class _RequestsSectionState extends State<RequestsSection> {
           SizedBox(height: 20),
         ]
       )
+    );
+  }
+
+  ServiceCard showServiceCard(Service service) {
+    return ServiceCard(
+      service: service,
+      onCancel: () => onCancelAction(service.id!, ServiceStatus.canceled.value),
     );
   }
 

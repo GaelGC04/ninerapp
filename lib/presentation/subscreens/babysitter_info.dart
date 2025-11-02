@@ -66,20 +66,7 @@ class _BabysitterInfoScreenState extends State<BabysitterInfoScreen> {
                   coloredBorder: true
                 ),
                 AppButton(
-                  onPressed: () async {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => RequestBabysitterScreen(
-                          babysitter: widget.babysitter,
-                          parent: widget.parent,
-                          onRequest: () {
-                            if (!mounted) return;
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                      )
-                    );
-                  },
+                  onPressed: _openRequestBabysitterScreen,
                   backgroundColor: AppColors.currentSectionColor,
                   textColor: AppColors.white,
                   text: 'Contratar',
@@ -92,6 +79,21 @@ class _BabysitterInfoScreenState extends State<BabysitterInfoScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  void _openRequestBabysitterScreen() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => RequestBabysitterScreen(
+          babysitter: widget.babysitter,
+          parent: widget.parent,
+          onRequest: () {
+            if (!mounted) return;
+            Navigator.of(context).pop();
+          },
+        ),
+      )
     );
   }
 }

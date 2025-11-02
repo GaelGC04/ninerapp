@@ -9,7 +9,7 @@ class StripeService {
 
   Future<bool> makePayment(double amount) async {
     try {
-      String? result = await _createPaymentIntent(amount, 'mxn');
+      String? result = await createPaymentIntent(amount, 'mxn');
       
       if (result == null) {
         return false;
@@ -36,13 +36,13 @@ class StripeService {
     }
   }
 
-  Future<String?> _createPaymentIntent(double amount, String currency) async {
+  Future<String?> createPaymentIntent(double amount, String currency) async {
     await dotenv.load(fileName: ".env");
     final String stripeSecretKey = dotenv.env['STRIPE_SECRET_KEY']!;
     try {
       final Dio dio = Dio();
       Map<String, dynamic> data = {
-        "amount": _calculateAmount(amount),
+        "amount": calculateAmount(amount),
         "currency": currency,
       };
       var response = await dio.post(
@@ -67,7 +67,7 @@ class StripeService {
     return null;
   }
 
-  String _calculateAmount(double amount) {
+  String calculateAmount(double amount) {
     final calculatedAmount = (amount * 100).toInt().toString();
     return calculatedAmount;
   }

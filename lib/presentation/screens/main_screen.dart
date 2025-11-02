@@ -32,7 +32,7 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
-  void toggleLoginRegister(bool value) {
+  void showingLoginScreen(bool value) {
     setState(() {
       _showLogin = value;
     });
@@ -43,18 +43,22 @@ class _MainScreenState extends State<MainScreen> {
     return Scaffold(
       body: _user == null
       ? _showLogin == true
-        ? Login(setUser: setUser, toggleLoginRegister: toggleLoginRegister)
-        : Register(setUser: setUser, toggleLoginRegister: toggleLoginRegister)
+        ? showLoginSection()
+        : showRegisterSection()
       : Column(
         children: [
-          mainContent(),
-          footer(),
+          seeMainScreen(),
+          showFooter(),
         ],
       ),
     );
   }
 
-  Expanded mainContent() {
+  Login showLoginSection() => Login(setUser: setUser, toggleLoginRegister: showingLoginScreen);
+
+  Register showRegisterSection() => Register(setUser: setUser, toggleLoginRegister: showingLoginScreen);
+
+  Expanded seeMainScreen() {
     return Expanded(
       child: switch (currentSection) {
         'Inicio' => HomeSection(user: _user!),
@@ -67,7 +71,7 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  Container footer() {
+  Container showFooter() {
     return Container(
       decoration: const BoxDecoration(
         color: AppColors.secondary,
@@ -78,24 +82,22 @@ class _MainScreenState extends State<MainScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            footerIcon('Inicio', FontAwesomeIcons.solidHouse),
-            footerIcon('Hijo(s)', FontAwesomeIcons.baby),
-            footerIcon('Niñeros', FontAwesomeIcons.personBreastfeeding),
-            footerIcon('Solicitudes', FontAwesomeIcons.personCircleQuestion),
-            footerIcon('Opciones', FontAwesomeIcons.gear),
+            _footerIcon('Inicio', FontAwesomeIcons.solidHouse),
+            _footerIcon('Hijo(s)', FontAwesomeIcons.baby),
+            _footerIcon('Niñeros', FontAwesomeIcons.personBreastfeeding),
+            _footerIcon('Solicitudes', FontAwesomeIcons.personCircleQuestion),
+            _footerIcon('Opciones', FontAwesomeIcons.gear),
           ]
         ),
       ),
     );
   }
 
-  Expanded footerIcon(String sectionName, IconData icon) {
+  Expanded _footerIcon(String sectionName, IconData icon) {
     return Expanded(
       child: InkWell(
         onTap: (){
-          setState(() {
-            currentSection = sectionName;
-          });
+          _changeSection(sectionName);
         },
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -106,5 +108,11 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
     );
+  }
+
+  void _changeSection(String sectionName) {
+    return setState(() {
+      currentSection = sectionName;
+    });
   }
 }

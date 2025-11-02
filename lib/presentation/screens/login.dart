@@ -129,26 +129,7 @@ class _LoginState extends State<Login> {
             const SizedBox(height: 30),
             Center(
               child: AppButton(
-                onPressed: () async {
-                  setState(() {
-                    _loading = true;
-                  });
-                  Parent? loggedParent = await _parentRepository.getParentByEmailAndPassword(_emailController.text, Cipher.hashPassword(_passwordController.text));
-                  Babysitter? loggedBabysitter = await _babysitterRepository.getBabysitterByEmailAndPassword(_emailController.text, Cipher.hashPassword(_passwordController.text));
-
-                  if (loggedParent == null && loggedBabysitter == null) {
-                    setState(() {
-                      _loading = false;
-                      _notRegistered = true;
-                    });
-                    return;
-                  }
-                  if (loggedParent != null) {
-                    widget.setUser(loggedParent);
-                  } else if (loggedBabysitter != null){
-                    widget.setUser(loggedBabysitter);
-                  }
-                },
+                onPressed: startSession,
                 backgroundColor: AppColors.currentSectionColor,
                 textColor: AppColors.white,
                 text: 'Iniciar sesión',
@@ -161,6 +142,27 @@ class _LoginState extends State<Login> {
         ),
       ),
     );
+  }
+
+  void startSession() async {
+    setState(() {
+      _loading = true;
+    });
+    Parent? loggedParent = await _parentRepository.getParentByEmailAndPassword(_emailController.text, Cipher.hashPassword(_passwordController.text));
+    Babysitter? loggedBabysitter = await _babysitterRepository.getBabysitterByEmailAndPassword(_emailController.text, Cipher.hashPassword(_passwordController.text));
+
+    if (loggedParent == null && loggedBabysitter == null) {
+      setState(() {
+        _loading = false;
+        _notRegistered = true;
+      });
+      return;
+    }
+    if (loggedParent != null) {
+      widget.setUser(loggedParent);
+    } else if (loggedBabysitter != null){
+      widget.setUser(loggedBabysitter);
+    }
   }
 
   Row header() {

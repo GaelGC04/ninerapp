@@ -230,60 +230,7 @@ class _RegisterState extends State<Register> {
 
             Center(
               child: AppButton(
-                onPressed: () async {
-                  setState(() {
-                    _loading = true;
-                  });
-                  late Parent newParent;
-                  late Babysitter newBabysitter;
-                  bool notExists = true;
-                  if (await _babysitterRepository.getBabysitterByEmail(_emailController.text.trim()) != null || await _parentRepository.getParentByEmail(_emailController.text.trim()) != null) {
-                    notExists = false;
-                  }
-
-                  if (notExists == false) {
-                    setState(() {
-                      _loading = false;
-                      _emailIsRegistered = !notExists;
-                    });
-                    return;
-                  }
-                  if (_isParent == true) {
-                    newParent = Parent(
-                      password: Cipher.hashPassword(_passwordController.text),
-                      name: _nameController.text.trim(),
-                      lastName: _lastNameController.text.trim(),
-                      birthdate: null,
-                      email: _emailController.text.trim(),
-                      isFemale: _isFemale,
-                      stars: 0,
-                    );
-                  } else if (_isParent == false) {
-                    newBabysitter = Babysitter(
-                      password: Cipher.hashPassword(_passwordController.text),
-                      name: _nameController.text.trim(),
-                      lastName: _lastNameController.text.trim(),
-                      birthdate: null,
-                      isFemale: _isFemale,
-                      email: _emailController.text.trim(),
-                      pricePerHour: 0,
-                      workStartYear: 0,
-                      expPhysicalDisability: false,
-                      expHearingDisability: false,
-                      expVisualDisability: false,
-                      expOtherDisabilities: null,
-                    );
-                  }
-                  if (_isParent == true) {
-                    int newId = await _parentRepository.addParent(newParent);
-                    newParent.id = newId;
-                    widget.setUser(newParent);
-                  } else {
-                    int newId = await _babysitterRepository.addBabysitter(newBabysitter);
-                    newBabysitter.id = newId;
-                    widget.setUser(newBabysitter);
-                  }
-                },
+                onPressed: tryRegister,
                 backgroundColor: AppColors.currentSectionColor,
                 textColor: AppColors.white,
                 text: 'Registrarse',
@@ -296,6 +243,61 @@ class _RegisterState extends State<Register> {
         ),
       ),
     );
+  }
+
+  void tryRegister() async {
+    setState(() {
+      _loading = true;
+    });
+    late Parent newParent;
+    late Babysitter newBabysitter;
+    bool notExists = true;
+    if (await _babysitterRepository.getBabysitterByEmail(_emailController.text.trim()) != null || await _parentRepository.getParentByEmail(_emailController.text.trim()) != null) {
+      notExists = false;
+    }
+
+    if (notExists == false) {
+      setState(() {
+        _loading = false;
+        _emailIsRegistered = !notExists;
+      });
+      return;
+    }
+    if (_isParent == true) {
+      newParent = Parent(
+        password: Cipher.hashPassword(_passwordController.text),
+        name: _nameController.text.trim(),
+        lastName: _lastNameController.text.trim(),
+        birthdate: null,
+        email: _emailController.text.trim(),
+        isFemale: _isFemale,
+        stars: 0,
+      );
+    } else if (_isParent == false) {
+      newBabysitter = Babysitter(
+        password: Cipher.hashPassword(_passwordController.text),
+        name: _nameController.text.trim(),
+        lastName: _lastNameController.text.trim(),
+        birthdate: null,
+        isFemale: _isFemale,
+        email: _emailController.text.trim(),
+        pricePerHour: 0,
+        workStartYear: 0,
+        expPhysicalDisability: false,
+        expHearingDisability: false,
+        expVisualDisability: false,
+        expOtherDisabilities: null,
+      );
+    }
+    if (_isParent == true) {
+      int newId = await _parentRepository.addParent(newParent);
+      newParent.id = newId;
+      widget.setUser(newParent);
+    } else {
+      int newId = await _babysitterRepository.addBabysitter(newBabysitter);
+      newBabysitter.id = newId;
+      widget.setUser(newBabysitter);
+    }
   }
 
   Row header() {

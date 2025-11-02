@@ -187,39 +187,7 @@ class _ChildFormScreenState extends State<ChildFormScreen> {
                   coloredBorder: true
                 ),
                 AppButton(
-                  onPressed: () async {
-                    setState(() {
-                      _addingChild = true;
-                    });
-
-                    final String newName = _nameController.text.trim();
-                    final String newLastName = _lastNameController.text.trim();
-                    final DateTime newBirthdate = DateFormat('dd-MM-yyyy').parse(_birthdateText.trim());
-                    final bool newIsFemale = _selectedGender == 'Mujer';
-                    final bool newDisabilityFisica = _disabilityFisica;
-                    final bool newDisabilityAuditiva = _disabilityAuditiva;
-                    final bool newDisabilityVisual = _disabilityVisual;
-                    final String? newOtherDisability = _otherDisabilityController.text.trim().isEmpty ? null : _otherDisabilityController.text.trim();
-
-                    await _childRepository.addChild(
-                      Child(
-                        name: newName,
-                        lastName: newLastName,
-                        birthdate: newBirthdate,
-                        isFemale: newIsFemale,
-                        parentId: widget.parent.id!,
-                        physicalDisability: newDisabilityFisica,
-                        hearingDisability: newDisabilityAuditiva,
-                        visualDisability: newDisabilityVisual,
-                        otherDisabilities: newOtherDisability,
-                      )
-                    );
-
-                    if (!mounted) return;
-                    widget.onSave();
-                    // ignore: use_build_context_synchronously
-                    Navigator.of(context).pop();
-                  },
+                  onPressed: _saveChild,
                   backgroundColor: AppColors.currentSectionColor,
                   textColor: AppColors.white,
                   text: 'Guardar',
@@ -234,6 +202,40 @@ class _ChildFormScreenState extends State<ChildFormScreen> {
         ),
       ),
     );
+  }
+
+  void _saveChild() async {
+    setState(() {
+      _addingChild = true;
+    });
+
+    final String newName = _nameController.text.trim();
+    final String newLastName = _lastNameController.text.trim();
+    final DateTime newBirthdate = DateFormat('dd-MM-yyyy').parse(_birthdateText.trim());
+    final bool newIsFemale = _selectedGender == 'Mujer';
+    final bool newDisabilityFisica = _disabilityFisica;
+    final bool newDisabilityAuditiva = _disabilityAuditiva;
+    final bool newDisabilityVisual = _disabilityVisual;
+    final String? newOtherDisability = _otherDisabilityController.text.trim().isEmpty ? null : _otherDisabilityController.text.trim();
+
+    await _childRepository.addChild(
+      Child(
+        name: newName,
+        lastName: newLastName,
+        birthdate: newBirthdate,
+        isFemale: newIsFemale,
+        parentId: widget.parent.id!,
+        physicalDisability: newDisabilityFisica,
+        hearingDisability: newDisabilityAuditiva,
+        visualDisability: newDisabilityVisual,
+        otherDisabilities: newOtherDisability,
+      )
+    );
+
+    if (!mounted) return;
+    widget.onSave();
+    // ignore: use_build_context_synchronously
+    Navigator.of(context).pop();
   }
 
   Future<void> _selectDate(BuildContext context) async {

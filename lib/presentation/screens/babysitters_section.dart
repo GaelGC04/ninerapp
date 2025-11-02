@@ -103,10 +103,7 @@ class _BabysittersSectionState extends State<BabysittersSection> {
                     children: [
                       SizedBox(height: 10),
                       ...babysittersList.map((babysitter) {
-                        return BabysitterCard(
-                          babysitter: babysitter,
-                          parent: widget.parent,
-                        );
+                        return showBabysitterCard(babysitter);
                       }),
                     ],
                   ),
@@ -116,6 +113,13 @@ class _BabysittersSectionState extends State<BabysittersSection> {
           ],
         ],
       ),
+    );
+  }
+
+  BabysitterCard showBabysitterCard(Babysitter babysitter) {
+    return BabysitterCard(
+      babysitter: babysitter,
+      parent: widget.parent,
     );
   }
 
