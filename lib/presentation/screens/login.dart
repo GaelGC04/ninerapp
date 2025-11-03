@@ -45,21 +45,25 @@ class _LoginState extends State<Login> {
       body: Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(height: 60),
-                  header(),
-                  SizedBox(height: 60),
-                  formContainer(),
-                  SizedBox(height: 90),
-                  bottom()
-                ],
-              ),
-            ),
+            child: showForm(),
           ),
+        ],
+      ),
+    );
+  }
+
+  SingleChildScrollView showForm() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(height: 60),
+          header(),
+          SizedBox(height: 60),
+          formContainer(),
+          SizedBox(height: 90),
+          bottom()
         ],
       ),
     );
