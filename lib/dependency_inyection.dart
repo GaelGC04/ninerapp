@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:ninerapp/data/repositories/parent_repository.dart';
 import 'package:ninerapp/data/repositories/service_repository.dart';
+import 'package:ninerapp/data/services/local_auth_service.dart';
 import 'package:ninerapp/domain/repositories/iparent_repository.dart';
 import 'package:ninerapp/domain/repositories/iservice_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -14,7 +15,8 @@ final getIt = GetIt.instance;
 void setupDependencies() {
   // Se llama al supabase cliente
   getIt.registerSingleton<SupabaseClient>(Supabase.instance.client);
-
+  // Servicio de guardado local en BD
+  getIt.registerSingleton<LocalAuthService>(LocalAuthService());
   // Aquí se añaden los repositorios
   getIt.registerSingleton<IChildRepository>(ChildRepository(supabase: getIt<SupabaseClient>()));
   getIt.registerSingleton<IBabysitterRepository>(BabysitterRepository(supabase: getIt<SupabaseClient>()));

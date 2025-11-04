@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:ninerapp/core/util/location_service.dart';
+import 'package:ninerapp/data/services/local_auth_service.dart';
 import 'package:ninerapp/dependency_inyection.dart';
 import 'package:ninerapp/domain/entities/babysitter.dart';
 import 'package:ninerapp/domain/entities/person.dart';
 import 'package:ninerapp/domain/repositories/ibabysitter_repository.dart';
+import 'package:ninerapp/domain/repositories/iparent_repository.dart';
 import 'package:ninerapp/presentation/screens/babysitters_section.dart';
 import 'package:ninerapp/domain/entities/parent.dart';
 import 'package:ninerapp/presentation/screens/children_section.dart';
@@ -25,32 +27,65 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  final IParentRepository _parentRepository = getIt<IParentRepository>();
   final IBabysitterRepository _babysitterRepository = getIt<IBabysitterRepository>();
+  final LocalAuthService _localAuthService = getIt<LocalAuthService>();
+
   String currentSection = 'Inicio';
 
   Person? _user;
   bool _showLogin = true;
-
+  bool _isSessionLoading = true; // TODO que salga imagen de icono centrada en grande
+  
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _loadUserFromLocalSession();
       await updateLocation();
+      setState(() {
+        _isSessionLoading = false;
+      });
     });
   }
-  // TODO cargar usuario de bd local para cargar sesion
+
+  // Se carga el usuario desde BD local
+  Future<void> _loadUserFromLocalSession() async {
+    final sessionData = await _localAuthService.loadUserSession();
+    if (sessionData != null) {
+      final int userId = sessionData['id'];
+      final String userType = sessionData['type'];
+
+      try {
+        if (userType == 'parent') {
+          final Parent parent = await _parentRepository.getParentById(userId);
+          setUser(parent, saveLocal: false);
+        } else if (userType == 'babysitter') {
+          final Babysitter babysitter = await _babysitterRepository.getBabysitterById(userId);
+          setUser(babysitter, saveLocal: false);
+        }
+      } catch (e) {
+        debugPrint('Error al cargar sesión local: $e');
+        await _localAuthService.clearUserSession();
+      }
+    }
+  }
   // TODO cambiar form de registro para babysitters y añadir fecha de nac en todos
   // TODO añadir screen de edicion de hijos y detalles
   // TODO AHORA Editar información personal
   
-  void setUser(Person user) async {
+  void setUser(Person user, {bool saveLocal = true}) async {
     setState(() {
       _user = user;
     });
+    if (saveLocal) {
+      await _localAuthService.saveUserSession(user);
+    }
     await updateLocation();
   }
 
-  void unsetUser() {
+  void unsetUser() async {
+    await _localAuthService.clearUserSession();
     setState(() {
       _user = null;
     });
