@@ -1,4 +1,5 @@
 
+import 'package:ninerapp/domain/entities/person.dart';
 import 'package:ninerapp/domain/entities/service.dart';
 
 abstract class IServiceRepository {
@@ -7,5 +8,5 @@ abstract class IServiceRepository {
   Future<List<Service>> getServicesByParentId(int id, bool isFinished);
   Future<void> addService(Service service);
   Future<void> updateServiceStatus(int id, String status);
-  Future<void> deleteService(int id);
+  Future<void> deleteService(int id, Person person);
 }

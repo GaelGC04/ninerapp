@@ -40,7 +40,8 @@ class _MainScreenState extends State<MainScreen> {
   }
   // TODO cargar usuario de bd local para cargar sesion
   // TODO cambiar form de registro para babysitters y añadir fecha de nac en todos
-
+  // TODO AHORA Borrar servicios finalizados
+  
   void setUser(Person user) async {
     setState(() {
       _user = user;
@@ -99,8 +100,8 @@ class _MainScreenState extends State<MainScreen> {
         'Hijo(s)' => ChildrenSection(parent: _user! as Parent),
         'HijoAdd' => ChildrenSection(parent: _user! as Parent, addingChild: true),
         'Niñeros' => BabysittersSection(parent: _user! as Parent),
-        'Solicitudes' => RequestsSection(parent: _user! as Parent),
-        'Historial' => RequestsSection(parent: _user! as Parent, showingFinishedServices: true),
+        'Solicitudes' => RequestsSection(person: _user!),
+        'Historial' => RequestsSection(person: _user!, showingFinishedServices: true),
         'Opciones' => OptionsSection(),
         _ => HomeSection(user: _user!, changeSection: _changeSection),
       },

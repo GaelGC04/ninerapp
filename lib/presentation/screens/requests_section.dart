@@ -4,19 +4,19 @@ import 'package:ninerapp/core/constants/app_colors.dart';
 import 'package:ninerapp/core/constants/app_textstyles.dart';
 import 'package:ninerapp/dependency_inyection.dart';
 import 'package:ninerapp/domain/entities/parent.dart';
+import 'package:ninerapp/domain/entities/person.dart';
 import 'package:ninerapp/domain/entities/service.dart';
-import 'package:ninerapp/domain/entities/service_status.dart';
 import 'package:ninerapp/domain/repositories/iservice_repository.dart';
 import 'package:ninerapp/presentation/widgets/app_button.dart';
 import 'package:ninerapp/presentation/widgets/service_card.dart';
 
 class RequestsSection extends StatefulWidget {
-  final Parent parent;
+  final Person person;
   final bool showingFinishedServices;
   
   const RequestsSection({
     super.key,
-    required this.parent,
+    required this.person,
     this.showingFinishedServices = false,
   });
 
@@ -46,7 +46,12 @@ class _RequestsSectionState extends State<RequestsSection> {
     });
 
     try {
-      final servicesRes = await _serviceRepository.getServicesByParentId(widget.parent.id!, areFinished);
+      final List<Service> servicesRes;
+      if (widget.person is Parent) {
+        servicesRes = await _serviceRepository.getServicesByParentId(widget.person.id!, areFinished);
+      } else {
+        servicesRes = await _serviceRepository.getServicesByBabysitterId(widget.person.id!, areFinished);
+      }
       setState(() {
         servicesList = servicesRes;
 
@@ -125,12 +130,8 @@ class _RequestsSectionState extends State<RequestsSection> {
   ServiceCard showServiceCard(Service service) {
     return ServiceCard(
       service: service,
-      onCancel: () => onCancelAction(service.id!, ServiceStatus.canceled.value),
+      onStatusChange: () => _loadServices(_showingFinishedServices),
+      person: widget.person,
     );
-  }
-
-  void onCancelAction(int id, String status) async {
-    await _serviceRepository.updateServiceStatus(id, status);
-    _loadServices(_showingFinishedServices);
   }
 }

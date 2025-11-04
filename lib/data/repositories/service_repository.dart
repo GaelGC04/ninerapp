@@ -1,4 +1,7 @@
+import 'package:ninerapp/domain/entities/babysitter.dart';
 import 'package:ninerapp/domain/entities/child.dart';
+import 'package:ninerapp/domain/entities/parent.dart';
+import 'package:ninerapp/domain/entities/person.dart';
 import 'package:ninerapp/domain/entities/service.dart';
 import 'package:ninerapp/domain/entities/service_status.dart';
 import 'package:ninerapp/domain/repositories/iservice_repository.dart';
@@ -33,8 +36,38 @@ class ServiceRepository implements IServiceRepository {
   }
 
   @override
-  Future<void> deleteService(int id) async {
+  Future<void> deleteService(int id, Person person) async {
     try {
+      final response = await _supabase
+        .from('service')
+        .select('*, babysitter:babysitter(*), parent:parent(*)')
+        .eq('id', id)
+        .maybeSingle();
+
+      final Service service = Service.fromMap({
+        ...?response,
+        'babysitter': response!['babysitter'],
+        'parent': response['parent']
+      }, []);
+
+      if (person is Parent) {
+        if (service.deletedByBabysitter == false) {
+          await _supabase
+            .from('service')
+            .update({'deleted_by_parent': true})
+            .eq('id', id);
+          return;
+        }
+      } else if (person is Babysitter) {
+        if (service.deletedByParent == false) {
+          await _supabase
+            .from('service')
+            .update({'deleted_by_parent': true})
+            .eq('id', id);
+          return;
+        }
+      }
+
       return await _supabase.from('service').delete().eq('id', id);
     } on PostgrestException catch (e) {
       throw Exception('Error al eliminar servicio: ${e.message}');
@@ -82,6 +115,7 @@ class ServiceRepository implements IServiceRepository {
         .from('service')
         .select('*, babysitter:babysitter(*), parent:parent(*)')
         .eq('babysitter_id', id)
+        .eq('deleted_by_babysitter', false)
         .order('date', ascending: true);
 
       for (var service in response) {
@@ -116,6 +150,7 @@ class ServiceRepository implements IServiceRepository {
         .from('service')
         .select('*, babysitter:babysitter(*), parent:parent(*)')
         .eq('parent_id', id)
+        .eq('deleted_by_parent', false)
         .order('date', ascending: true);
 
       final List<Service> services = (response as List)
