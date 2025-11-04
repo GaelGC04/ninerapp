@@ -118,8 +118,8 @@ class _BabysitterCardState extends State<BabysitterCard> {
   }
 
   String _getDistance() {
-    if (widget.parent.lastLatitude == null || widget.parent.lastLongitude == null) return "Ubicación desconocida";
-    if (widget.babysitter.lastLatitude == null || widget.babysitter.lastLongitude == null) return "Ubicación desconocida";
+    if (widget.parent.lastLatitude == null || widget.parent.lastLongitude == null || widget.babysitter.lastLatitude == null || widget.babysitter.lastLongitude == null) return "Ubicación sin definir";
+    if (widget.babysitter.distanceMeters == null) return "Ubicación desconocida";
 
     return "A ${widget.babysitter.distanceMeters!} metros";
   }

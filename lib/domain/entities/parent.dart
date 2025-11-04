@@ -3,13 +3,13 @@ import 'package:ninerapp/domain/entities/person.dart';
 class Parent extends Person {
   final String password;
   final String email;
-  final double stars;
+  final int rating;
+  final int amountRatings;
 
   Parent({
     super.id,
     required this.password,
     required this.email,
-    required this.stars,
     
     required super.name,
     required super.lastName,
@@ -17,6 +17,8 @@ class Parent extends Person {
     required super.isFemale,
     required super.lastLatitude,
     required super.lastLongitude,
+    required this.rating,
+    required this.amountRatings,
   });
 
   static Parent fromMap(Map<String, dynamic> map) {
@@ -29,10 +31,16 @@ class Parent extends Person {
       birthdate: (map['birthdate'] as String?) == null ? null : DateTime.parse(map['birthdate'] as String),
       isFemale: map['is_female'] as bool,
 
-      stars: (map['stars'] as num).toDouble(), // HACER, esto no va pero para de momento dejar algo
       lastLatitude: null,
       lastLongitude: null,
+      rating: (map['rating'] as num).toInt(),
+      amountRatings: (map['amount_ratings'] as num).toInt(),
     );
+  }
+
+  double getAverageStars() {
+    if (amountRatings == 0) return 0;
+    return (rating / amountRatings);
   }
 
   @override
@@ -40,7 +48,8 @@ class Parent extends Person {
     return super.toMap()..addAll({
       'password': password,
       'email': email,
-      'stars': stars,
+      'rating': rating,
+      'amount_ratings': amountRatings,
     });
   }
 }

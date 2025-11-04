@@ -9,8 +9,8 @@ class Babysitter extends Person {
   final bool expHearingDisability;
   final bool expVisualDisability;
   final String? expOtherDisabilities;
-  final double rating;
-  final double amountRatings;
+  final int rating;
+  final int amountRatings;
 
   late int? distanceMeters;
   late bool isFavorite;
@@ -56,8 +56,8 @@ class Babysitter extends Person {
       expOtherDisabilities: map['exp_other_disabilities'] as String?,
       lastLatitude: map['last_latitude'] == null ? null : double.parse(map['last_latitude']),
       lastLongitude: map['last_latitude'] == null ? null : double.parse(map['last_longitude']),
-      rating: (map['rating'] as num).toDouble(),
-      amountRatings: (map['amount_ratings'] as num).toDouble(),
+      rating: (map['rating'] as num).toInt(),
+      amountRatings: (map['amount_ratings'] as num).toInt(),
     );
   }
 

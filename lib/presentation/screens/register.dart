@@ -276,9 +276,10 @@ class _RegisterState extends State<Register> {
         birthdate: null,
         email: _emailController.text.trim(),
         isFemale: _isFemale,
-        stars: 0,
         lastLatitude: null,
         lastLongitude: null,
+        rating: 0,
+        amountRatings: 0,
       );
     } else if (_isParent == false) {
       newBabysitter = Babysitter(

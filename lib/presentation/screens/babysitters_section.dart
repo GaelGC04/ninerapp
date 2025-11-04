@@ -102,17 +102,18 @@ class _BabysittersSectionState extends State<BabysittersSection> {
             ),
           ] else ... [
             Expanded(
-              child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      SizedBox(height: 10),
-                      ...babysittersList.map((babysitter) {
-                        return showBabysitterCard(babysitter);
-                      }),
-                    ],
-                  ),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    SizedBox(height: 10),
+                    ...babysittersList.map((babysitter) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
+                        child: showBabysitterCard(babysitter),
+                      );
+                    }),
+                    SizedBox(height: 20),
+                  ],
                 ),
               ),
             ),

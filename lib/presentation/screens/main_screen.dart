@@ -40,13 +40,20 @@ class _MainScreenState extends State<MainScreen> {
   }
   // TODO cargar usuario de bd local para cargar sesion
   // TODO cambiar form de registro para babysitters y añadir fecha de nac en todos
-  // TODO AHORA Borrar servicios finalizados
+  // TODO añadir screen de edicion de hijos y detalles
+  // TODO AHORA Editar información personal
   
   void setUser(Person user) async {
     setState(() {
       _user = user;
     });
     await updateLocation();
+  }
+
+  void unsetUser() {
+    setState(() {
+      _user = null;
+    });
   }
 
   Future<void> updateLocation() async {
@@ -102,7 +109,7 @@ class _MainScreenState extends State<MainScreen> {
         'Niñeros' => BabysittersSection(parent: _user! as Parent),
         'Solicitudes' => RequestsSection(person: _user!),
         'Historial' => RequestsSection(person: _user!, showingFinishedServices: true),
-        'Opciones' => OptionsSection(),
+        'Opciones' => OptionsSection(person: _user!, onSessionClosed: unsetUser),
         _ => HomeSection(user: _user!, changeSection: _changeSection),
       },
     );
