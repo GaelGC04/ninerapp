@@ -10,7 +10,69 @@ class BabysitterRepository implements IBabysitterRepository {
   BabysitterRepository({required SupabaseClient supabase}) : _supabase = supabase;
 
   @override
-  Future<List<Babysitter>> getBabysitters(int minimumStars, int minDistanceMts, int maxDistanceMts, int minExpYears, int maxExpYears, int minPricePerHour, int maxPricePerHour, bool hasPhysicalDisabilityExp, bool hasVisualDisabilityExp, bool hasHearingDisabilityExp, double? lastLatitude, double? lastLongitude) async {
+  Future<List<Babysitter>> getFavoriteBabysitters(double? lastLatitude, double? lastLongitude, int parentId) async {
+    try {
+      final favoriteIdsResponse = await _supabase
+        .from("client_favorite_babysitters")
+        .select('babysitter_id')
+        .eq('parent_id', parentId);
+
+      final List<int> favoriteBabysitterIds = (favoriteIdsResponse as List)
+        .map((map) => map['babysitter_id'] as int)
+        .toList();
+      
+      // Si no hay favoritos, devolvemos una lista vacía para evitar errores en la consulta IN
+      if (favoriteBabysitterIds.isEmpty) {
+        return [];
+      }
+      
+      final babysittersResponse = await _supabase
+        .from('babysitter')
+        .select('*')
+        .filter('id', 'in', favoriteBabysitterIds); // Filtra por la lista de IDs de favoritos
+
+      List<Babysitter> favoriteBabysitters = (babysittersResponse as List)
+        .map((babysitterMap) => Babysitter.fromMap(babysitterMap))
+        .toList();
+
+      final bool calculateDistance = lastLatitude != null && lastLongitude != null;
+
+      if (calculateDistance) {
+        final LatLng userLocation = LatLng(lastLatitude, lastLongitude);
+        
+        for (var babysitter in favoriteBabysitters) {
+          if (babysitter.lastLatitude != null && babysitter.lastLongitude != null) {
+            final babysitterLocation = LatLng(babysitter.lastLatitude!, babysitter.lastLongitude!);
+            
+            final distanceMeters = LocationService.getDistanceInMeters(
+              userLocation, 
+              babysitterLocation
+            );
+            babysitter.distanceMeters = distanceMeters;
+          } else {
+            babysitter.distanceMeters = null; 
+          }
+          
+          babysitter.isFavorite = true; 
+        }
+
+        favoriteBabysitters.sort((a, b) {
+          final distanceA = a.distanceMeters ?? 999999999;
+          final distanceB = b.distanceMeters ?? 999999999;
+          return distanceA.compareTo(distanceB);
+        });
+      }
+      
+      return favoriteBabysitters;
+    } on PostgrestException catch (e) {
+      throw Exception('Error al obtener niñeros: ${e.message}');
+    } catch (e) {
+      throw Exception('Error inesperado al obtener los niñeros: $e');
+    }
+  }
+
+  @override
+  Future<List<Babysitter>> getBabysitters(int minimumStars, int minDistanceMts, int maxDistanceMts, int minExpYears, int maxExpYears, int minPricePerHour, int maxPricePerHour, bool hasPhysicalDisabilityExp, bool hasVisualDisabilityExp, bool hasHearingDisabilityExp, double? lastLatitude, double? lastLongitude, int parentId) async {
     try {
       var query = _supabase.from('babysitter').select('*'); 
 
@@ -80,7 +142,24 @@ class BabysitterRepository implements IBabysitterRepository {
         }).toList();
       }
 
-      if (filterByDistanceEnabled) {
+      final favoriteResponse = await _supabase
+        .from('client_favorite_babysitters')
+        .select('babysitter_id')
+        .eq('parent_id', parentId);
+
+      final Set<int> favoriteIds = (favoriteResponse as List)
+        .map((map) => map['babysitter_id'] as int)
+        .toSet();
+
+      for (var babysitter in filteredList) {
+        if (favoriteIds.contains(babysitter.id)) {
+          babysitter.isFavorite = true; 
+        } else {
+          babysitter.isFavorite = false;
+        }
+      }
+
+      if (filterByDistanceEnabled == true) {
         filteredList.sort((a, b) {
           // Si la distancia es nula (un niñero sin ubicación), se envía al final de la lista
           final distanceA = a.distanceMeters ?? 999999999;
@@ -196,6 +275,40 @@ class BabysitterRepository implements IBabysitterRepository {
       throw Exception('Error al obtener niñero: ${e.message}');
     } catch (e) {
       throw Exception('Error inesperado al obtener a niñero: $e');
+    }
+  }
+  
+  @override
+  Future<void> editBabysitterFavorite(int babysitterId, int parentId, bool isFavorite) async {
+    try {
+      // 1. Verificar si la relación ya existe
+      final existingFavorite = await _supabase
+        .from('client_favorite_babysitters')
+        .select('*')
+        .eq('babysitter_id', babysitterId)
+        .eq('parent_id', parentId)
+        .maybeSingle();
+
+      final bool exists = existingFavorite != null;
+
+      if (isFavorite && !exists) {
+        // Si se quiere marcar como fav
+        await _supabase
+          .from('client_favorite_babysitters')
+          .insert({'babysitter_id': babysitterId, 'parent_id': parentId});
+      } else if (!isFavorite && exists) {
+        // Si se quiere desmarcar como fav
+        await _supabase
+          .from('client_favorite_babysitters')
+          .delete()
+          .eq('babysitter_id', babysitterId)
+          .eq('parent_id', parentId);
+      }
+
+    } on PostgrestException catch (e) {
+      throw Exception('Error al editar favorito en la base de datos: ${e.message}');
+    } catch (e) {
+      throw Exception('Error inesperado al editar favorito: $e');
     }
   }
 }

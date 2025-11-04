@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:ninerapp/core/constants/app_colors.dart';
 import 'package:ninerapp/core/constants/app_shadows.dart';
 import 'package:ninerapp/core/constants/app_textstyles.dart';
+import 'package:ninerapp/dependency_inyection.dart';
 import 'package:ninerapp/domain/entities/babysitter.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ninerapp/domain/entities/parent.dart';
+import 'package:ninerapp/domain/repositories/ibabysitter_repository.dart';
 import 'package:ninerapp/presentation/subscreens/babysitter_info.dart';
 
 class BabysitterCard extends StatefulWidget {
@@ -22,7 +24,14 @@ class BabysitterCard extends StatefulWidget {
 }
 
 class _BabysitterCardState extends State<BabysitterCard> {
+  final IBabysitterRepository _babysitterRepository = getIt<IBabysitterRepository>();
   bool isFavorite = false;
+
+  @override
+  void initState() {
+    super.initState();
+    isFavorite = widget.babysitter.isFavorite;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -123,10 +132,10 @@ class _BabysitterCardState extends State<BabysitterCard> {
     );
   }
 
-  void onFavoritePress() {
+  void onFavoritePress() async {
     setState(() {
       isFavorite = !isFavorite;
-      // HACER guardar el nuevo valor en la bd con aydua del repository
     });
+    await _babysitterRepository.editBabysitterFavorite(widget.babysitter.id!, widget.parent.id!, isFavorite);
   }
 }

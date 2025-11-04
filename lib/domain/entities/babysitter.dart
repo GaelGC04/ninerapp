@@ -13,6 +13,7 @@ class Babysitter extends Person {
   final double amountRatings;
 
   late int? distanceMeters;
+  late bool isFavorite;
 
   Babysitter({
     super.id,
@@ -33,6 +34,8 @@ class Babysitter extends Person {
     required this.rating,
     required this.amountRatings,
     this.distanceMeters,
+
+    this.isFavorite = false,
   });
 
   static Babysitter fromMap(Map<String, dynamic> map) {

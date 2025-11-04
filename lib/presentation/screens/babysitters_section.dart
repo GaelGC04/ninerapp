@@ -53,7 +53,12 @@ class _BabysittersSectionState extends State<BabysittersSection> {
     });
 
     try {
-      final babysittersRes = await _babysitterRepository.getBabysitters(minimumStars, minDistanceMts, maxDistanceMts, minExpYears, maxExpYears, minPricePerHour, maxPricePerHour, hasPhysicalDisabilityExp, hasVisualDisabilityExp, hasHearingDisabilityExp, widget.parent.lastLatitude, widget.parent.lastLongitude);
+      final List<Babysitter> babysittersRes;
+      if (currentList == "Todos") {
+        babysittersRes = await _babysitterRepository.getBabysitters(minimumStars, minDistanceMts, maxDistanceMts, minExpYears, maxExpYears, minPricePerHour, maxPricePerHour, hasPhysicalDisabilityExp, hasVisualDisabilityExp, hasHearingDisabilityExp, widget.parent.lastLatitude, widget.parent.lastLongitude, widget.parent.id!);
+      } else {
+        babysittersRes = await _babysitterRepository.getFavoriteBabysitters(widget.parent.lastLatitude, widget.parent.lastLongitude, widget.parent.id!);
+      }
       setState(() {
         babysittersList = babysittersRes;
 
@@ -139,22 +144,25 @@ class _BabysittersSectionState extends State<BabysittersSection> {
               setState(() {
                 currentList = option;
               });
+              _loadBabysitters();
             }),
             SizedBox(width: 10),
-          ]), // TODO añadir accion para mostrar entre todos o favoritos parte de marcar niñeros favoritos
+          ]),
           Spacer(),
-          Container(
-            height: 40, width: 40,
-            decoration: BoxDecoration(
-              color: AppColors.white,
-              borderRadius: BorderRadius.circular(10),
+          if (currentList == "Todos") ...[
+            Container(
+              height: 40, width: 40,
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: IconButton(
+                onPressed: showFilterWindow,
+                icon: Icon(FontAwesomeIcons.filter), color: AppColors.currentListOption,
+                style: ButtonStyle(overlayColor: WidgetStateProperty.all(AppColors.invisible))
+              )
             ),
-            child: IconButton(
-              onPressed: showFilterWindow,
-              icon: Icon(FontAwesomeIcons.filter), color: AppColors.currentListOption,
-              style: ButtonStyle(overlayColor: WidgetStateProperty.all(AppColors.invisible))
-            )
-          )
+          ],
         ]
       ),
     );

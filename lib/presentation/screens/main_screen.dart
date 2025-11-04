@@ -39,6 +39,7 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
   // TODO cargar usuario de bd local para cargar sesion
+  // TODO cambiar form de registro para babysitters y añadir fecha de nac en todos
 
   void setUser(Person user) async {
     setState(() {
