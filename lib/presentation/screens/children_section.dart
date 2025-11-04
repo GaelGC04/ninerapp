@@ -12,10 +12,12 @@ import 'package:ninerapp/presentation/widgets/child_card.dart';
 
 class ChildrenSection extends StatefulWidget {
   final Parent parent;
+  final bool addingChild;
   
   const ChildrenSection({
     super.key,
-    required this.parent
+    required this.parent,
+    this.addingChild = false,
   });
 
   @override
@@ -40,6 +42,12 @@ class _ChildrenSectionState extends State<ChildrenSection> {
   void initState() {
     super.initState();
     _loadChildren();
+    
+    if (widget.addingChild == true) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _openNewChildScreen();
+      });
+    }
   }
 
   Future<void> _loadChildren() async {

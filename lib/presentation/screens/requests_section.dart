@@ -12,10 +12,12 @@ import 'package:ninerapp/presentation/widgets/service_card.dart';
 
 class RequestsSection extends StatefulWidget {
   final Parent parent;
+  final bool showingFinishedServices;
   
   const RequestsSection({
     super.key,
-    required this.parent
+    required this.parent,
+    this.showingFinishedServices = false,
   });
 
   @override
@@ -27,12 +29,13 @@ class _RequestsSectionState extends State<RequestsSection> {
   List<Service> servicesList = [];
   bool _isLoading = true;
   String? _errorMessage;
-  bool _showingFinishedServices = false;
+  late bool _showingFinishedServices;
 
   @override
   void initState() {
+    _showingFinishedServices = widget.showingFinishedServices;
     super.initState();
-    _loadServices(false);
+    _loadServices(_showingFinishedServices);
   }
 
   Future<void> _loadServices(bool areFinished) async {

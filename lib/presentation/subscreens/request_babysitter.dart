@@ -1,13 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:location/location.dart';
 import 'package:ninerapp/core/constants/app_colors.dart';
 import 'package:ninerapp/core/constants/app_textstyles.dart';
 import 'package:ninerapp/core/util/time_number_format.dart';
+import 'package:ninerapp/core/util/location_service.dart';
 import 'package:ninerapp/dependency_inyection.dart';
 import 'package:ninerapp/domain/entities/babysitter.dart';
 import 'package:ninerapp/domain/entities/child.dart';
@@ -66,39 +67,17 @@ class _RequestBabysitterScreenState extends State<RequestBabysitterScreen> {
   @override
   void initState() {
     super.initState();
-    _getLocation();
     _loadChildren();
     _loadBabysitter();
   }
 
-  Future<void> _getLocation() async {
-    Location location = Location();
-    bool serviceEnabled;
-    PermissionStatus permissionGranted;
-    LocationData locationData;
-
-    serviceEnabled = await location.serviceEnabled();
-    if (!serviceEnabled) {
-      serviceEnabled = await location.requestService();
-      if (!serviceEnabled) {
-        return;
-      }
-    }
-
-    permissionGranted = await location.hasPermission();
-    if (permissionGranted == PermissionStatus.denied) {
-      permissionGranted = await location.requestPermission();
-      if (permissionGranted != PermissionStatus.granted) {
-        return;
-      }
-    }
-
-    locationData = await location.getLocation();
-
-    if (!mounted) return;
+  void _getLocation() async {
+    final LatLng newLocation = widget.parent.lastLatitude != null && widget.parent.lastLongitude != null
+      ? LatLng(widget.parent.lastLatitude!, widget.parent.lastLongitude!)
+      : await LocationService.getLocation() as LatLng;
 
     setState(() {
-      _currentLocation = LatLng(locationData.latitude!, locationData.longitude!);
+      _currentLocation = newLocation;
 
       // Con esta parte se cambia la posición de el mapa al obtener la ubi actual del usuario
       _mapController.animateCamera(
@@ -331,6 +310,7 @@ class _RequestBabysitterScreenState extends State<RequestBabysitterScreen> {
                   markers: _markers,
                   onMapCreated: (GoogleMapController controller) {
                     _mapController = controller;
+                    _getLocation();
                   },
 
                   // Para cuando se deje presionado se asigne una nueva ubicación
@@ -428,6 +408,10 @@ class _RequestBabysitterScreenState extends State<RequestBabysitterScreen> {
       latitude: _currentLocation.latitude,
       longitude: _currentLocation.longitude,
       instructions: _instructionsController.text.trim() == "" ? null : _instructionsController.text.trim(),
+      ratedByBabysitter: false,
+      ratedByParent: false,
+      deletedByBabysitter: false,
+      deletedByParent: false,
     );
     for (var child in childrenList.keys) {
       if (childrenList[child] == true) {
@@ -468,12 +452,11 @@ class _RequestBabysitterScreenState extends State<RequestBabysitterScreen> {
                 hintText: "Horas",
                 validation: () {
                   setState(() {
-                    if (num.tryParse(_hoursController.text) == null) {
-                      _hoursController.text = "";
-                    }
                     _formIsValid = (_serviceDateText.isNotEmpty && _hoursController.text.isNotEmpty && _minutesController.text.isNotEmpty && childrenList.values.any((value) => value == true));
                   });
                 },
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*'))],
               ),
             ],
           ),
@@ -490,12 +473,11 @@ class _RequestBabysitterScreenState extends State<RequestBabysitterScreen> {
                 hintText: "Minutos",
                 validation: () {
                   setState(() {
-                    if (num.tryParse(_minutesController.text) == null) {
-                      _minutesController.text = "";
-                    }
                     _formIsValid = (_serviceDateText.isNotEmpty && _hoursController.text.isNotEmpty && _minutesController.text.isNotEmpty && childrenList.values.any((value) => value == true));
                   });
-                }
+                },
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*'))],
               ),
             ],
           ),

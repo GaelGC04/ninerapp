@@ -4,6 +4,8 @@ class Person {
   final String lastName;
   final DateTime? birthdate;
   final bool isFemale;
+  late double? lastLatitude;
+  late double? lastLongitude;
 
   Person({
     this.id,
@@ -11,6 +13,8 @@ class Person {
     required this.lastName,
     required this.birthdate,
     required this.isFemale,
+    required this.lastLatitude,
+    required this.lastLongitude,
   });
 
   int? getAge() {

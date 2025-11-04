@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:ninerapp/core/util/location_service.dart';
+import 'package:ninerapp/dependency_inyection.dart';
+import 'package:ninerapp/domain/entities/babysitter.dart';
 import 'package:ninerapp/domain/entities/person.dart';
+import 'package:ninerapp/domain/repositories/ibabysitter_repository.dart';
 import 'package:ninerapp/presentation/screens/babysitters_section.dart';
 import 'package:ninerapp/domain/entities/parent.dart';
 import 'package:ninerapp/presentation/screens/children_section.dart';
@@ -20,16 +25,44 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  // HACER hay que hacer un callback para enviar a homesection para que al presionar los botones del inicio se vaya tambien a las diferentes secciones de la app
+  final IBabysitterRepository _babysitterRepository = getIt<IBabysitterRepository>();
   String currentSection = 'Inicio';
 
   Person? _user;
   bool _showLogin = true;
 
-  void setUser(Person user) {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await updateLocation();
+    });
+  }
+  // TODO cargar usuario de bd local para cargar sesion
+
+  void setUser(Person user) async {
     setState(() {
       _user = user;
     });
+    await updateLocation();
+  }
+
+  Future<void> updateLocation() async {
+    try {
+      LatLng? currentLocation = await LocationService.getLocation();
+
+      if (_user == null) return;
+      setState(() {
+        _user!.lastLatitude = currentLocation?.latitude;
+        _user!.lastLongitude = currentLocation?.longitude;
+      });
+      if (_user != null && _user is Babysitter) {
+        Babysitter babysitter = _user as Babysitter;
+        await _babysitterRepository.updateBabysitter(babysitter);
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 
   void showingLoginScreen(bool value) {
@@ -61,12 +94,14 @@ class _MainScreenState extends State<MainScreen> {
   Expanded seeMainScreen() {
     return Expanded(
       child: switch (currentSection) {
-        'Inicio' => HomeSection(user: _user!),
+        'Inicio' => HomeSection(user: _user!, changeSection: _changeSection),
         'Hijo(s)' => ChildrenSection(parent: _user! as Parent),
+        'HijoAdd' => ChildrenSection(parent: _user! as Parent, addingChild: true),
         'Niñeros' => BabysittersSection(parent: _user! as Parent),
         'Solicitudes' => RequestsSection(parent: _user! as Parent),
+        'Historial' => RequestsSection(parent: _user! as Parent, showingFinishedServices: true),
         'Opciones' => OptionsSection(),
-        _ => HomeSection(user: _user!),
+        _ => HomeSection(user: _user!, changeSection: _changeSection),
       },
     );
   }
@@ -110,7 +145,11 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  void _changeSection(String sectionName) {
+  void _changeSection(String sectionName) async {
+    if (sectionName == 'Inicio') {
+      updateLocation();
+    }
+
     return setState(() {
       currentSection = sectionName;
     });

@@ -7,6 +7,7 @@ import 'package:ninerapp/domain/entities/babysitter.dart';
 import 'package:ninerapp/domain/entities/parent.dart';
 import 'package:ninerapp/domain/repositories/ibabysitter_repository.dart';
 import 'package:ninerapp/presentation/widgets/babysitter_card.dart';
+import 'package:ninerapp/presentation/widgets/filter_modal.dart';
 
 class BabysittersSection extends StatefulWidget {
   final Parent parent;
@@ -52,7 +53,7 @@ class _BabysittersSectionState extends State<BabysittersSection> {
     });
 
     try {
-      final babysittersRes = await _babysitterRepository.getBabysitters(minimumStars, minDistanceMts, maxDistanceMts, minExpYears, maxExpYears, minPricePerHour, maxPricePerHour, hasPhysicalDisabilityExp, hasVisualDisabilityExp, hasHearingDisabilityExp);
+      final babysittersRes = await _babysitterRepository.getBabysitters(minimumStars, minDistanceMts, maxDistanceMts, minExpYears, maxExpYears, minPricePerHour, maxPricePerHour, hasPhysicalDisabilityExp, hasVisualDisabilityExp, hasHearingDisabilityExp, widget.parent.lastLatitude, widget.parent.lastLongitude);
       setState(() {
         babysittersList = babysittersRes;
 
@@ -82,6 +83,7 @@ class _BabysittersSectionState extends State<BabysittersSection> {
       ),
       body: Column(
         children: [
+          buttonsBar(),
           if (_isLoading)
             Expanded(child: Center(child: CircularProgressIndicator(color: AppColors.primary)))
           else if (_errorMessage != null)
@@ -94,7 +96,6 @@ class _BabysittersSectionState extends State<BabysittersSection> {
               ),
             ),
           ] else ... [
-            buttonsBar(),
             Expanded(
               child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
@@ -140,7 +141,7 @@ class _BabysittersSectionState extends State<BabysittersSection> {
               });
             }),
             SizedBox(width: 10),
-          ]), // HACER añadir accion para mostrar entre todos o favoritos
+          ]), // TODO añadir accion para mostrar entre todos o favoritos parte de marcar niñeros favoritos
           Spacer(),
           Container(
             height: 40, width: 40,
@@ -149,9 +150,7 @@ class _BabysittersSectionState extends State<BabysittersSection> {
               borderRadius: BorderRadius.circular(10),
             ),
             child: IconButton(
-              onPressed: (){
-                // HACER que salga modal para filtrar niñeros
-              },
+              onPressed: showFilterWindow,
               icon: Icon(FontAwesomeIcons.filter), color: AppColors.currentListOption,
               style: ButtonStyle(overlayColor: WidgetStateProperty.all(AppColors.invisible))
             )
@@ -159,6 +158,45 @@ class _BabysittersSectionState extends State<BabysittersSection> {
         ]
       ),
     );
+  }
+
+  Future<void> showFilterWindow() async {
+    final Map<String, dynamic>? newFilters = await showDialog(
+      context: context,
+      builder: (context) {
+        return FilterWindow(
+          initialMinimumStars: minimumStars,
+          initialMinDistanceMts: minDistanceMts,
+          initialMaxDistanceMts: maxDistanceMts,
+          initialMinExpYears: minExpYears,
+          initialMaxExpYears: maxExpYears,
+          initialMinPricePerHour: minPricePerHour,
+          initialMaxPricePerHour: maxPricePerHour,
+          initialHasPhysicalDisabilityExp: hasPhysicalDisabilityExp,
+          initialHasVisualDisabilityExp: hasVisualDisabilityExp,
+          initialHasHearingDisabilityExp: hasHearingDisabilityExp,
+        );
+      },
+    );
+
+    // Se presionó "Aplicar"
+    if (newFilters != null) {
+      // Se actualiza el estado de la pantalla principal con los nuevos filtros aplicados
+      setState(() {
+        minimumStars = newFilters['minimumStars'];
+        minDistanceMts = newFilters['minDistanceMts'];
+        maxDistanceMts = newFilters['maxDistanceMts'];
+        minExpYears = newFilters['minExpYears'];
+        maxExpYears = newFilters['maxExpYears'];
+        minPricePerHour = newFilters['minPricePerHour'];
+        maxPricePerHour = newFilters['maxPricePerHour'];
+        hasPhysicalDisabilityExp = newFilters['hasPhysicalDisabilityExp'];
+        hasVisualDisabilityExp = newFilters['hasVisualDisabilityExp'];
+        hasHearingDisabilityExp = newFilters['hasHearingDisabilityExp'];
+      });
+
+      _loadBabysitters();
+    }
   }
 
   TextButton optionButton(String option, VoidCallback? onPressed) {

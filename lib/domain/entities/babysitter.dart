@@ -9,6 +9,10 @@ class Babysitter extends Person {
   final bool expHearingDisability;
   final bool expVisualDisability;
   final String? expOtherDisabilities;
+  final double rating;
+  final double amountRatings;
+
+  late int? distanceMeters;
 
   Babysitter({
     super.id,
@@ -24,6 +28,11 @@ class Babysitter extends Person {
     required this.expHearingDisability,
     required this.expVisualDisability,
     this.expOtherDisabilities,
+    required super.lastLatitude,
+    required super.lastLongitude,
+    required this.rating,
+    required this.amountRatings,
+    this.distanceMeters,
   });
 
   static Babysitter fromMap(Map<String, dynamic> map) {
@@ -42,7 +51,16 @@ class Babysitter extends Person {
       expHearingDisability: map['exp_hearing_disability'] as bool,
       expVisualDisability: map['exp_visual_disability'] as bool,
       expOtherDisabilities: map['exp_other_disabilities'] as String?,
+      lastLatitude: map['last_latitude'] == null ? null : double.parse(map['last_latitude']),
+      lastLongitude: map['last_latitude'] == null ? null : double.parse(map['last_longitude']),
+      rating: (map['rating'] as num).toDouble(),
+      amountRatings: (map['amount_ratings'] as num).toDouble(),
     );
+  }
+
+  double getAverageStars() {
+    if (amountRatings == 0) return 0;
+    return (rating / amountRatings);
   }
 
   @override
@@ -55,6 +73,10 @@ class Babysitter extends Person {
       'exp_hearing_disability': expHearingDisability,
       'exp_visual_disability': expVisualDisability,
       'exp_other_disabilities': expOtherDisabilities,
+      'last_latitude': lastLatitude,
+      'last_longitude': lastLongitude,
+      'rating': rating,
+      'amount_ratings': amountRatings,
     });
   }
 

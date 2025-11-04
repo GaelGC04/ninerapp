@@ -220,7 +220,8 @@ class _RegisterState extends State<Register> {
                   textColor: !_isParent ? AppColors.white : AppColors.currentSectionColor,
                   text: _isFemale == true ? 'Niñera' : 'Niñero',
                   icon: null,
-                  coloredBorder: !_isParent ? true : false
+                  coloredBorder: !_isParent ? true : false,
+                  isLocked: true,
                 ),
               ],
             ),
@@ -276,6 +277,8 @@ class _RegisterState extends State<Register> {
         email: _emailController.text.trim(),
         isFemale: _isFemale,
         stars: 0,
+        lastLatitude: null,
+        lastLongitude: null,
       );
     } else if (_isParent == false) {
       newBabysitter = Babysitter(
@@ -291,6 +294,10 @@ class _RegisterState extends State<Register> {
         expHearingDisability: false,
         expVisualDisability: false,
         expOtherDisabilities: null,
+        lastLatitude: null,
+        lastLongitude: null,
+        rating: 0,
+        amountRatings: 0,
       );
     }
     if (_isParent == true) {

@@ -59,7 +59,7 @@ class _BabysitterCardState extends State<BabysitterCard> {
                   children: [
                     Icon(FontAwesomeIcons.locationArrow, size: 14, color: AppColors.fontColor),
                     SizedBox(width: 5),
-                    Text('a 800 metros', style: AppTextstyles.childCardText, maxLines: 1, overflow: TextOverflow.ellipsis), // HACER añadir attr de ubicacion para obtener distancia en metros
+                    Text(_getDistance(), style: AppTextstyles.childCardText, maxLines: 1, overflow: TextOverflow.ellipsis), // HACER añadir attr de ubicacion para obtener distancia en metros
                   ],
                 ),
                 SizedBox(height: 2),
@@ -88,7 +88,7 @@ class _BabysitterCardState extends State<BabysitterCard> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Text((4.58).toStringAsFixed(1), style: AppTextstyles.childCardText.copyWith(color: AppColors.white), textAlign: TextAlign.center), // HACER con metodo de get stars en babysitter calcular promedio
+                    Text((widget.babysitter.getAverageStars()).toStringAsFixed(1), style: AppTextstyles.childCardText.copyWith(color: AppColors.white), textAlign: TextAlign.center), // HACER con metodo de get stars en babysitter calcular promedio
                     Icon(FontAwesomeIcons.solidStar, size: 14, color: AppColors.white),
                   ]
                 ),
@@ -106,6 +106,13 @@ class _BabysitterCardState extends State<BabysitterCard> {
         ],
       ),
     );
+  }
+
+  String _getDistance() {
+    if (widget.parent.lastLatitude == null || widget.parent.lastLongitude == null) return "Ubicación desconocida";
+    if (widget.babysitter.lastLatitude == null || widget.babysitter.lastLongitude == null) return "Ubicación desconocida";
+
+    return "A ${widget.babysitter.distanceMeters!} metros";
   }
 
   void _openBabysitterInfo() {

@@ -16,6 +16,10 @@ class Service {
   final double latitude;
   final double longitude;
   final String? instructions;
+  final bool deletedByParent;
+  final bool deletedByBabysitter;
+  final bool ratedByParent;
+  final bool ratedByBabysitter;
 
   Service({
     this.id,
@@ -31,6 +35,10 @@ class Service {
     required this.latitude,
     required this.longitude,
     this.instructions,
+    required this.deletedByParent,
+    required this.deletedByBabysitter,
+    required this.ratedByParent,
+    required this.ratedByBabysitter,
   });
 
   static Service fromMap(Map<String, dynamic> map, List<Child> list) {
@@ -44,9 +52,13 @@ class Service {
       minutes: map['minutes'] as int,
       totalPrice: (map['total_price'] as num).toDouble(),
       status: map['status'] as String,
-      latitude: map['latitude'] as double,
-      longitude: map['longitude'] as double,
+      latitude: double.parse(map['latitude']),
+      longitude: double.parse(map['longitude']),
       instructions: map['instructions'] as String?,
+      ratedByParent: map['rated_by_parent'] as bool,
+      ratedByBabysitter: map['rated_by_babysitter'] as bool,
+      deletedByParent: map['deleted_by_parent'] as bool,
+      deletedByBabysitter: map['deleted_by_babysitter'] as bool,
     );
   }
 
@@ -63,6 +75,10 @@ class Service {
       'latitude': latitude,
       'longitude': longitude,
       'instructions': instructions,
+      'deleted_by_parent': deletedByParent,
+      'deleted_by_babysitter': deletedByBabysitter,
+      'rated_by_parent': ratedByParent,
+      'rated_by_babysitter': ratedByBabysitter,
     };
   }
 }

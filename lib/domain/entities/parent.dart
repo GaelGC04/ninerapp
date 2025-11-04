@@ -10,10 +10,13 @@ class Parent extends Person {
     required this.password,
     required this.email,
     required this.stars,
+    
     required super.name,
     required super.lastName,
     required super.birthdate,
     required super.isFemale,
+    required super.lastLatitude,
+    required super.lastLongitude,
   });
 
   static Parent fromMap(Map<String, dynamic> map) {
@@ -27,6 +30,8 @@ class Parent extends Person {
       isFemale: map['is_female'] as bool,
 
       stars: (map['stars'] as num).toDouble(), // HACER, esto no va pero para de momento dejar algo
+      lastLatitude: null,
+      lastLongitude: null,
     );
   }
 

@@ -7,10 +7,12 @@ import 'package:ninerapp/domain/entities/person.dart';
 
 class HomeSection extends StatefulWidget {
   final Person user;
+  final Function(String) changeSection;
 
   const HomeSection({
     super.key,
-    required this.user
+    required this.user,
+    required this.changeSection,
   });
 
   @override
@@ -37,25 +39,25 @@ class _HomeSectionState extends State<HomeSection> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  iconInfo(AppColors.addChildColor, FontAwesomeIcons.baby, "Añadir hij@"),
+                  iconInfo(AppColors.addChildColor, FontAwesomeIcons.baby, "Añadir hij@", "HijoAdd"),
                   SizedBox(width: 20),
-                  iconInfo(AppColors.seeBabysittersColor, FontAwesomeIcons.personBreastfeeding, "Ver niñeros"),
+                  iconInfo(AppColors.seeBabysittersColor, FontAwesomeIcons.personBreastfeeding, "Ver niñeros", "Niñeros"),
                 ]
               ),
               SizedBox(height: 30),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  iconInfo(AppColors.historyColor, FontAwesomeIcons.clock, "Historial"),
+                  iconInfo(AppColors.historyColor, FontAwesomeIcons.clock, "Historial", "Historial"),
                   SizedBox(width: 20),
-                  iconInfo(AppColors.settingsColor, FontAwesomeIcons.gear, "Opciones"),
+                  iconInfo(AppColors.settingsColor, FontAwesomeIcons.gear, "Opciones", "Opciones"),
                 ]
               ),
               SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  iconInfo(AppColors.requestsColor, FontAwesomeIcons.personCircleQuestion, "Solicitudes"),
+                  iconInfo(AppColors.requestsColor, FontAwesomeIcons.personCircleQuestion, "Solicitudes", "Solicitudes"),
                 ],
               ),
               SizedBox(height: 20),
@@ -66,22 +68,27 @@ class _HomeSectionState extends State<HomeSection> {
     );
   }
 
-  Expanded iconInfo(Color bgColor, IconData icon, String text) {
+  Expanded iconInfo(Color bgColor, IconData icon, String text, String sectionName) {
     return Expanded(
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: bgColor,
-          boxShadow: [AppShadows.indexBoxShadow],
-        ),
-        padding: const EdgeInsets.fromLTRB(10, 30, 10, 20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 50, color: AppColors.fontColor),
-            SizedBox(height: 25),
-            Text(text, style: AppTextstyles.indexSubtitle, textAlign: TextAlign.center)
-          ],
+      child: GestureDetector(
+        onTap: (){
+          widget.changeSection(sectionName);
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: bgColor,
+            boxShadow: [AppShadows.indexBoxShadow],
+          ),
+          padding: const EdgeInsets.fromLTRB(10, 30, 10, 20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 50, color: AppColors.fontColor),
+              SizedBox(height: 25),
+              Text(text, style: AppTextstyles.indexSubtitle, textAlign: TextAlign.center)
+            ],
+          ),
         ),
       ),
     );
@@ -104,8 +111,8 @@ class _HomeSectionState extends State<HomeSection> {
               children: [
                 Text("${widget.user.name} ${widget.user.lastName}", style: AppTextstyles.indexTitle, textAlign: TextAlign.center),
                 SizedBox(height: 25),
-                Text("2 hijos registrados", style: AppTextstyles.indexSubtitle, textAlign: TextAlign.center),
-                Text("20 servicios contratados", style: AppTextstyles.indexSubtitle, textAlign: TextAlign.center)
+                Text("x hijos registrados", style: AppTextstyles.indexSubtitle, textAlign: TextAlign.center),
+                Text("y servicios contratados", style: AppTextstyles.indexSubtitle, textAlign: TextAlign.center)
               ],
             ),
           ),

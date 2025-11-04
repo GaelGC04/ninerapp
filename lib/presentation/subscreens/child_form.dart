@@ -229,6 +229,8 @@ class _ChildFormScreenState extends State<ChildFormScreen> {
         hearingDisability: newDisabilityAuditiva,
         visualDisability: newDisabilityVisual,
         otherDisabilities: newOtherDisability,
+        lastLatitude: null,
+        lastLongitude: null,
       )
     );
 

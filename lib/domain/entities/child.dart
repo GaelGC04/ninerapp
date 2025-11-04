@@ -18,6 +18,8 @@ class Child extends Person {
     required this.hearingDisability,
     required this.visualDisability,
     this.otherDisabilities,
+    required super.lastLatitude,
+    required super.lastLongitude,
   });
 
   static Child fromMap(Map<String, dynamic> map) {
@@ -32,6 +34,8 @@ class Child extends Person {
       hearingDisability: map['hearing_disability'] as bool,
       visualDisability: map['visual_disability'] as bool,
       otherDisabilities: map['other_disability'] as String?,
+      lastLatitude: null,
+      lastLongitude: null,
     );
   }
 

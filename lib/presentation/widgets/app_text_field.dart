@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:ninerapp/core/constants/app_colors.dart';
 import 'package:ninerapp/core/constants/app_shadows.dart';
 import 'package:ninerapp/core/constants/app_textstyles.dart';
@@ -7,12 +8,16 @@ class AppTextField extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
   final VoidCallback validation;
+  final TextInputType? keyboardType;
+  final List<TextInputFormatter>? inputFormatters;
 
   const AppTextField({
     super.key,
     required this.controller,
     required this.hintText,
     required this.validation,
+    this.keyboardType,
+    this.inputFormatters,
   });
 
   @override
@@ -26,6 +31,8 @@ class AppTextField extends StatelessWidget {
       ),
       child: TextField(
         controller: controller,
+        keyboardType: keyboardType,
+        inputFormatters: inputFormatters,
         style: AppTextstyles.bodyText,
         decoration: InputDecoration(
           border: InputBorder.none,
