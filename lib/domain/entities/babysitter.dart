@@ -12,6 +12,8 @@ class Babysitter extends Person {
   final int rating;
   final int amountRatings;
 
+  final String? profileImageUrl;
+
   late int? distanceMeters;
   late bool isFavorite;
 
@@ -34,7 +36,7 @@ class Babysitter extends Person {
     required this.rating,
     required this.amountRatings,
     this.distanceMeters,
-
+    this.profileImageUrl,
     this.isFavorite = false,
   });
 
@@ -54,34 +56,39 @@ class Babysitter extends Person {
       expHearingDisability: map['exp_hearing_disability'] as bool,
       expVisualDisability: map['exp_visual_disability'] as bool,
       expOtherDisabilities: map['exp_other_disabilities'] as String?,
-      lastLatitude: map['last_latitude'] == null ? null : double.parse(map['last_latitude']),
-      lastLongitude: map['last_latitude'] == null ? null : double.parse(map['last_longitude']),
+
+      lastLatitude: map['last_latitude'] == null ? null : double.parse(map['last_latitude'].toString()),
+      lastLongitude: map['last_longitude'] == null ? null : double.parse(map['last_longitude'].toString()),
+
       rating: (map['rating'] as num).toInt(),
       amountRatings: (map['amount_ratings'] as num).toInt(),
-    );
-  }
 
-  double getAverageStars() {
-    if (amountRatings == 0) return 0;
-    return (rating / amountRatings);
+      profileImageUrl: map['profile_image_url'] as String?,
+    );
   }
 
   @override
   Map<String, dynamic> toMap() {
     return super.toMap()..addAll({
-      'password': password,
-      'email': email,
-      'price_per_hour': pricePerHour,
-      'exp_physical_disability': expPhysicalDisability,
-      'exp_hearing_disability': expHearingDisability,
-      'exp_visual_disability': expVisualDisability,
-      'exp_other_disabilities': expOtherDisabilities,
-      'last_latitude': lastLatitude,
-      'last_longitude': lastLongitude,
-      'rating': rating,
-      'amount_ratings': amountRatings,
-      'work_start_year': workStartYear,
-    });
+        'password': password,
+        'email': email,
+        'price_per_hour': pricePerHour,
+        'exp_physical_disability': expPhysicalDisability,
+        'exp_hearing_disability': expHearingDisability,
+        'exp_visual_disability': expVisualDisability,
+        'exp_other_disabilities': expOtherDisabilities,
+        'last_latitude': lastLatitude,
+        'last_longitude': lastLongitude,
+        'rating': rating,
+        'amount_ratings': amountRatings,
+        'work_start_year': workStartYear,
+        'profile_image_url': profileImageUrl,
+      });
+  }
+
+  double getAverageStars() {
+    if (amountRatings == 0) return 0;
+    return (rating / amountRatings);
   }
 
   int getExperienceYears() {
