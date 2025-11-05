@@ -455,7 +455,7 @@ class _RequestBabysitterScreenState extends State<RequestBabysitterScreen> {
 
   void sendParentPaymentMail(Service newService) async {
     await _emailService.sendEmail(
-      recipientEmail: newService.babysitter.email,
+      recipientEmail: newService.parent.email,
       subject: "Comprobante de pago",
       bodyHtml: """
         <h1>¡Hola ${newService.parent.name}!</h1>

@@ -13,6 +13,8 @@ void main() async {
   String supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY']!;
   Stripe.publishableKey = dotenv.env['STRIPE_PUBLIC_KEY']!;
 
+  // TODO abrir en info de servicio el mapa y la ubicacion donde es el servicio
+
   if (supabaseUrl.isEmpty || supabaseAnonKey.isEmpty) {
     throw Exception("No se encontró el archivo .env o no están las variables de supabase");
   }
