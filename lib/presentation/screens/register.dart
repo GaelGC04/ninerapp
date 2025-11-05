@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:ninerapp/core/constants/app_colors.dart';
 import 'package:ninerapp/core/constants/app_shadows.dart';
 import 'package:ninerapp/core/constants/app_textstyles.dart';
 import 'package:ninerapp/core/util/cipher.dart';
+import 'package:ninerapp/core/util/time_number_format.dart';
 import 'package:ninerapp/dependency_inyection.dart';
 import 'package:ninerapp/domain/entities/babysitter.dart';
 import 'package:ninerapp/domain/entities/parent.dart';
@@ -35,6 +38,11 @@ class _RegisterState extends State<Register> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _birthdateController = TextEditingController();
+  final TextEditingController _pricePerHourController = TextEditingController();
+  final TextEditingController _experienceYearsController = TextEditingController();
+
+  String _birthdateText = "";
 
   bool _isParent = true;
   bool _isFemale = true;
@@ -43,6 +51,18 @@ class _RegisterState extends State<Register> {
   bool _loading = false;
 
   bool _emailIsRegistered = false;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _nameController.dispose();
+    _lastNameController.dispose();
+    _passwordController.dispose();
+    _birthdateController.dispose();
+    _pricePerHourController.dispose();
+    _experienceYearsController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -106,29 +126,21 @@ class _RegisterState extends State<Register> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Nombre(s):', style: AppTextstyles.bodyText),
+            Text('Nombre(s): *', style: AppTextstyles.bodyText),
             const SizedBox(height: 8),
             AppTextField(
               controller: _nameController,
               hintText: "Ingresar nombre(s)",
-              validation: (){
-                setState(() {
-                  _formIsValid = _emailController.text.isNotEmpty && _nameController.text.isNotEmpty && _lastNameController.text.isNotEmpty && _emailController.text.isNotEmpty && _passwordController.text.isNotEmpty;
-                });
-              }
+              validation: _validateForm
             ),
             const SizedBox(height: 20),
 
-            Text('Apellido(s):', style: AppTextstyles.bodyText),
+            Text('Apellido(s): *', style: AppTextstyles.bodyText),
             const SizedBox(height: 8),
             AppTextField(
               controller: _lastNameController,
               hintText: "Ingresar apellido(s)",
-              validation: (){
-                setState(() {
-                  _formIsValid = _emailController.text.isNotEmpty && _nameController.text.isNotEmpty && _lastNameController.text.isNotEmpty && _emailController.text.isNotEmpty && _passwordController.text.isNotEmpty;
-                });
-              }
+              validation: _validateForm
             ),
             const SizedBox(height: 20),
 
@@ -166,29 +178,35 @@ class _RegisterState extends State<Register> {
             ),
             const SizedBox(height: 20),
 
-            Text('Correo electrónico:', style: AppTextstyles.bodyText),
+            Text("Fecha de nacimiento: *", style: AppTextstyles.bodyText),
+            const SizedBox(height: 8),
+            GestureDetector(
+              onTap: () => _selectDate(context),
+              child: AbsorbPointer(
+                child: AppTextField(
+                  controller: _birthdateController,
+                  hintText: "Ingresar fecha de nacimiento",
+                  validation: _validateForm
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            Text('Correo electrónico: *', style: AppTextstyles.bodyText),
             const SizedBox(height: 8),
             AppTextField(
               controller: _emailController,
               hintText: "Ingresar correo electrónico",
-              validation: (){
-                setState(() {
-                  _formIsValid = _emailController.text.isNotEmpty && _nameController.text.isNotEmpty && _lastNameController.text.isNotEmpty && _emailController.text.isNotEmpty && _passwordController.text.isNotEmpty;
-                });
-              }
+              validation: _validateForm
             ),
             const SizedBox(height: 20),
 
-            Text('Contraseña:', style: AppTextstyles.bodyText),
+            Text('Contraseña: *', style: AppTextstyles.bodyText),
             const SizedBox(height: 8),
             AppTextField(
               controller: _passwordController,
               hintText: "Ingresar contraseña",
-              validation: (){
-                setState(() {
-                  _formIsValid = _emailController.text.isNotEmpty && _nameController.text.isNotEmpty && _lastNameController.text.isNotEmpty && _emailController.text.isNotEmpty && _passwordController.text.isNotEmpty;
-                });
-              }
+              validation: _validateForm
             ),
             const SizedBox(height: 20),
 
@@ -202,6 +220,7 @@ class _RegisterState extends State<Register> {
                     setState(() {
                       _isParent = true;
                     });
+                    _validateForm();
                   },
                   backgroundColor: _isParent ? AppColors.currentSectionColor : AppColors.white,
                   textColor: _isParent ? AppColors.white : AppColors.currentSectionColor,
@@ -215,16 +234,48 @@ class _RegisterState extends State<Register> {
                     setState(() {
                       _isParent = false;
                     });
+                    _validateForm();
                   },
                   backgroundColor: !_isParent ? AppColors.currentSectionColor : AppColors.white,
                   textColor: !_isParent ? AppColors.white : AppColors.currentSectionColor,
                   text: _isFemale == true ? 'Niñera' : 'Niñero',
                   icon: null,
                   coloredBorder: !_isParent ? true : false,
-                  isLocked: true,
                 ),
               ],
             ),
+
+            if (_isParent == false) ...[
+              const SizedBox(height: 20),
+              Text('Precio por hora: *', style: AppTextstyles.bodyText),
+              const SizedBox(height: 8),
+              AppTextField(
+                controller: _pricePerHourController,
+                hintText: "Precio a cobrar por hora (mxn)",
+                validation: _validateForm,
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$'))],
+              ),
+              const SizedBox(height: 20),
+
+              Text('Años de experiencia: *', style: AppTextstyles.bodyText),
+              const SizedBox(height: 8),
+              AppTextField(
+                controller: _experienceYearsController,
+                hintText: "Años de experiencia",
+                validation: (){
+                  _experienceYearsController.text = int.tryParse(_experienceYearsController.text.trim()) != null
+                    ? int.parse(_experienceYearsController.text.trim()) > 60
+                      ? "60"
+                      : _experienceYearsController.text.trim()
+                    : "0";
+                  _validateForm();
+                },
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*'))],
+              ),
+              const SizedBox(height: 20),
+            ],
 
             if (_emailIsRegistered == true) ...[
               const SizedBox(height: 20),
@@ -250,6 +301,44 @@ class _RegisterState extends State<Register> {
     );
   }
 
+  void _validateForm() {
+    setState(() {
+      if (_isParent == true) {
+        _formIsValid = _nameController.text.isNotEmpty
+        && _lastNameController.text.isNotEmpty
+        && _birthdateController.text.isNotEmpty
+        && _emailController.text.isNotEmpty
+        && _passwordController.text.isNotEmpty;
+      } else if (_isParent == false) {
+        _formIsValid = _nameController.text.isNotEmpty
+        && _lastNameController.text.isNotEmpty
+        && _birthdateController.text.isNotEmpty
+        && _emailController.text.isNotEmpty
+        && _passwordController.text.isNotEmpty
+        && _pricePerHourController.text.isNotEmpty
+        && _experienceYearsController.text.isNotEmpty;
+      }
+    });
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime maxDate = DateTime.now().subtract(const Duration(days: 365 * 18));
+
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: maxDate,
+      firstDate: DateTime(1900),
+      lastDate: maxDate,
+    );
+    if (picked != null) {
+      setState(() {
+        _birthdateController.text = "${TimeNumberFormat.formatTwoDigits(picked.day)}-${TimeNumberFormat.getMonthName(picked.month)}-${picked.year}";
+        _birthdateText = "${picked.day}-${picked.month}-${picked.year}";
+        _formIsValid = (_nameController.text.isNotEmpty && _lastNameController.text.isNotEmpty && _birthdateText.isNotEmpty);
+      });
+    }
+  }
+
   void tryRegister() async {
     setState(() {
       _loading = true;
@@ -268,12 +357,14 @@ class _RegisterState extends State<Register> {
       });
       return;
     }
+    
+    final DateTime newBirthdate = DateFormat('dd-MM-yyyy').parse(_birthdateText.trim());
     if (_isParent == true) {
       newParent = Parent(
         password: Cipher.hashPassword(_passwordController.text),
         name: _nameController.text.trim(),
         lastName: _lastNameController.text.trim(),
-        birthdate: null,
+        birthdate: newBirthdate,
         email: _emailController.text.trim(),
         isFemale: _isFemale,
         lastLatitude: null,
@@ -282,15 +373,17 @@ class _RegisterState extends State<Register> {
         amountRatings: 0,
       );
     } else if (_isParent == false) {
+      int currentYear = DateTime.now().year;
+      int newExperienceYears = currentYear - int.parse(_experienceYearsController.text);
       newBabysitter = Babysitter(
         password: Cipher.hashPassword(_passwordController.text),
         name: _nameController.text.trim(),
         lastName: _lastNameController.text.trim(),
-        birthdate: null,
+        birthdate: newBirthdate,
         isFemale: _isFemale,
         email: _emailController.text.trim(),
-        pricePerHour: 0,
-        workStartYear: 0,
+        pricePerHour: _pricePerHourController.text.isNotEmpty ? double.parse(_pricePerHourController.text) : 100,
+        workStartYear: newExperienceYears,
         expPhysicalDisability: false,
         expHearingDisability: false,
         expVisualDisability: false,

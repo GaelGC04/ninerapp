@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ninerapp/core/constants/app_colors.dart';
 import 'package:ninerapp/core/constants/app_shadows.dart';
 import 'package:ninerapp/core/constants/app_textstyles.dart';
+import 'package:ninerapp/domain/entities/parent.dart';
 import 'package:ninerapp/domain/entities/person.dart';
 
 class HomeSection extends StatefulWidget {
@@ -36,14 +37,16 @@ class _HomeSectionState extends State<HomeSection> {
               SizedBox(height: 20),
               infoSection(),
               SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  iconInfo(AppColors.addChildColor, FontAwesomeIcons.baby, "Añadir hij@", "HijoAdd"),
-                  SizedBox(width: 20),
-                  iconInfo(AppColors.seeBabysittersColor, FontAwesomeIcons.personBreastfeeding, "Ver niñeros", "Niñeros"),
-                ]
-              ),
+              if (widget.user is Parent) ...[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    iconInfo(AppColors.addChildColor, FontAwesomeIcons.baby, "Añadir hij@", "HijoAdd"),
+                    SizedBox(width: 20),
+                    iconInfo(AppColors.seeBabysittersColor, FontAwesomeIcons.personBreastfeeding, "Ver niñeros", "Niñeros"),
+                  ]
+                ),
+              ],
               SizedBox(height: 30),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,

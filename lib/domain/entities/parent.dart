@@ -1,7 +1,7 @@
 import 'package:ninerapp/domain/entities/person.dart';
 
 class Parent extends Person {
-  final String password;
+  final String? password;
   final String email;
   final int rating;
   final int amountRatings;

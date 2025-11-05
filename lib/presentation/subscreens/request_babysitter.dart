@@ -202,7 +202,7 @@ class _RequestBabysitterScreenState extends State<RequestBabysitterScreen> {
             babysitterInfo(),
             const SizedBox(height: 30),
 
-            Text("Día y hora del servicio:", style: AppTextstyles.bodyText),
+            Text("Día y hora del servicio: *", style: AppTextstyles.bodyText),
             const SizedBox(height: 8),
             GestureDetector(
               onTap: () => _selectDate(context),
@@ -445,7 +445,7 @@ class _RequestBabysitterScreenState extends State<RequestBabysitterScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Horas:", style: AppTextstyles.bodyText),
+              Text("Horas: *", style: AppTextstyles.bodyText),
               const SizedBox(height: 8),
               AppTextField(
                 controller: _hoursController,
@@ -466,7 +466,7 @@ class _RequestBabysitterScreenState extends State<RequestBabysitterScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Minutos:", style: AppTextstyles.bodyText),
+              Text("Minutos: *", style: AppTextstyles.bodyText),
               const SizedBox(height: 8),
               AppTextField(
                 controller: _minutesController,

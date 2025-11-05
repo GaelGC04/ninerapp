@@ -8,17 +8,22 @@ import 'package:ninerapp/domain/entities/babysitter.dart';
 import 'package:ninerapp/domain/entities/child.dart';
 import 'package:ninerapp/domain/entities/parent.dart';
 import 'package:ninerapp/domain/entities/person.dart';
+import 'package:ninerapp/domain/repositories/ibabysitter_repository.dart';
 import 'package:ninerapp/domain/repositories/ichild_repository.dart';
+import 'package:ninerapp/domain/repositories/iparent_repository.dart';
+import 'package:ninerapp/presentation/subscreens/edit_user_screen.dart';
 import 'package:ninerapp/presentation/widgets/app_button.dart';
 
 class OptionsSection extends StatefulWidget {
   final Person person;
   final VoidCallback onSessionClosed;
+  final Function(Person) setUser;
 
   const OptionsSection({
     super.key,
     required this.person,
     required this.onSessionClosed,
+    required this.setUser,
   });
 
   @override
@@ -26,11 +31,14 @@ class OptionsSection extends StatefulWidget {
 }
 
 class _OptionsSectionState extends State<OptionsSection> {
+  final IParentRepository _parentRepository = getIt<IParentRepository>();
+  final IBabysitterRepository _babysitterRepository = getIt<IBabysitterRepository>();
+
   final IChildRepository _childRepository = getIt<IChildRepository>();
   List<Child> childrenList = [];
 
-  late Parent? _parent;
-  late Babysitter? _babysitter;
+  Parent? _parent;
+  Babysitter? _babysitter;
   int _stars = 0;
   bool _isLoading = true;
   String? _errorMessage;
@@ -66,9 +74,11 @@ class _OptionsSectionState extends State<OptionsSection> {
   void initState() {
     super.initState();
     _loadData();
+    debugPrint("APUNTO DE EJECUTAR IF DE PARENT");
     if (_parent != null) {
       _loadChildren();
     }
+    debugPrint("DESPUES DE EJECUTAR IF DE PARENT");
   }
 
   void _loadData() {
@@ -94,8 +104,10 @@ class _OptionsSectionState extends State<OptionsSection> {
           children: [
             const SizedBox(height: 20),
             personalInfo(),
-            const SizedBox(height: 20),
-            childrenListContent(),
+            if (widget.person is Parent) ...[
+              const SizedBox(height: 20),
+              childrenListContent(),
+            ],
             const SizedBox(height: 20),
             AppButton(
               onPressed: () {
@@ -104,12 +116,17 @@ class _OptionsSectionState extends State<OptionsSection> {
               backgroundColor: AppColors.lightGrey,
               textColor: AppColors.fontColor,
               text: "Cerrar sesión",
-              icon: FontAwesomeIcons.doorOpen,
+              icon: FontAwesomeIcons.rightFromBracket,
               coloredBorder: false
             ),
             const SizedBox(height: 14),
             AppButton(
-              onPressed: () async {
+              onPressed: () {
+                if (widget.person is Parent) {
+                  _parentRepository.deleteParent(_parent!.id!);
+                } else if (widget.person is Babysitter) {
+                  _babysitterRepository.deleteBabysitter(_babysitter!.id!);
+                }
                 // await deleteBabysitter / Parent
                 widget.onSessionClosed();
               },
@@ -160,12 +177,21 @@ class _OptionsSectionState extends State<OptionsSection> {
                         ]
                       );
                     }),
+                    ...List.generate(5 - _stars, (index) {
+                      return Row(
+                        children: [
+                          const SizedBox(width: 8),
+                          Icon(FontAwesomeIcons.star, color: AppColors.fontColor, size: 16),
+                        ]
+                      );
+                    }),
                   ],
                 ),
                 const SizedBox(height: 20),
                 Center(
                   child: AppButton(
                     onPressed: (){
+                      openUserEditionScreen(widget.person);
                     },
                     backgroundColor: AppColors.currentListOption,
                     textColor: AppColors.white,
@@ -178,6 +204,14 @@ class _OptionsSectionState extends State<OptionsSection> {
             ),
           )
         ],
+      ),
+    );
+  }
+
+  void openUserEditionScreen(Person currentUser) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => EditUserScreen(person: currentUser, setUser: widget.setUser),
       ),
     );
   }
@@ -209,8 +243,8 @@ class _OptionsSectionState extends State<OptionsSection> {
                       Text('${child.name} ${child.lastName}', style: AppTextstyles.bodyText),
                       Text(child.getAge() <= 0
                         ? child.getAge() == 0
-                          ? 'Recién nacido'
-                          : '${child.getAge().abs()} meses'
+                          ? '- Recién nacido'
+                          : '- ${child.getAge().abs()} meses'
                         : '${child.getAge()} años', style: AppTextstyles.bodyText),
                       Text(' - ${child.isFemale == true ? 'Niña' : 'Niño'}', style: AppTextstyles.bodyText),
                       if (childrenList.indexOf(child) != childrenList.length - 1) ...[

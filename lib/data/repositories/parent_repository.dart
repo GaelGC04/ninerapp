@@ -75,9 +75,14 @@ class ParentRepository implements IParentRepository {
   @override
   Future<void> updateParent(Parent parent) async {
     try {
+      final Map<String, dynamic> dataToUpdate = parent.toMap();
+      dataToUpdate.remove('password');
+      dataToUpdate.remove('rating');
+      dataToUpdate.remove('amount_ratings');
+
       return await _supabase
         .from('parent')
-        .update(parent.toMap())
+        .update(dataToUpdate)
         .eq('id', parent.id!);
     } on PostgrestException catch (e) {
       throw Exception('Error al actualizar madre/padre: ${e.message}');

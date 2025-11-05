@@ -65,7 +65,7 @@ class _ChildFormScreenState extends State<ChildFormScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Nombre(s):", style: AppTextstyles.bodyText),
+            Text("Nombre(s): *", style: AppTextstyles.bodyText),
             const SizedBox(height: 8),
             AppTextField(
               controller: _nameController,
@@ -78,7 +78,7 @@ class _ChildFormScreenState extends State<ChildFormScreen> {
             ),
             const SizedBox(height: 20),
 
-            Text("Apellido(s):", style: AppTextstyles.bodyText),
+            Text("Apellido(s): *", style: AppTextstyles.bodyText),
             const SizedBox(height: 8),
             AppTextField(
               controller: _lastNameController,
@@ -91,9 +91,9 @@ class _ChildFormScreenState extends State<ChildFormScreen> {
             ),
             const SizedBox(height: 20),
 
-            Text("Fecha de nacimiento:", style: AppTextstyles.bodyText),
+            Text("Fecha de nacimiento: *", style: AppTextstyles.bodyText),
             const SizedBox(height: 8),
-            GestureDetector( // Con esto se puede hacer que se abra un cuadro para la fecha
+            GestureDetector(
               onTap: () => _selectDate(context),
               child: AbsorbPointer(
                 child: AppTextField(

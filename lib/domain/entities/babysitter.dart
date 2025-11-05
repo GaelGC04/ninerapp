@@ -1,7 +1,7 @@
 import 'package:ninerapp/domain/entities/person.dart';
 
 class Babysitter extends Person {
-  final String password;
+  final String? password;
   final String email;
   final double pricePerHour;
   final int? workStartYear;
@@ -80,6 +80,7 @@ class Babysitter extends Person {
       'last_longitude': lastLongitude,
       'rating': rating,
       'amount_ratings': amountRatings,
+      'work_start_year': workStartYear,
     });
   }
 

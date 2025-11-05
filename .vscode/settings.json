@@ -28,5 +28,6 @@
         "titleBar.inactiveForeground": "#e7e7e799"
     },
     "java.configuration.updateBuildConfiguration": "interactive",
-    "peacock.color": "#1f0308"
+    "peacock.color": "#1f0308",
+    "cmake.sourceDirectory": "C:/Users/jorge/Documents/Trabajos/TrabajosEquipo/TSP_DepuradoresAnonimos/ninerapp/linux"
 }

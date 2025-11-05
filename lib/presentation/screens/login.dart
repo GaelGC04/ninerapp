@@ -40,6 +40,13 @@ class _LoginState extends State<Login> {
   bool _notRegistered = false;
 
   @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
@@ -101,7 +108,7 @@ class _LoginState extends State<Login> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Correo electrónico:', style: AppTextstyles.bodyText),
+            Text('Correo electrónico: *', style: AppTextstyles.bodyText),
             const SizedBox(height: 8),
             AppTextField(
               controller: _emailController,
@@ -113,7 +120,7 @@ class _LoginState extends State<Login> {
               }
             ),
             const SizedBox(height: 20),
-            Text('Contraseña:', style: AppTextstyles.bodyText),
+            Text('Contraseña: *', style: AppTextstyles.bodyText),
             const SizedBox(height: 8),
             AppTextField(
               controller: _passwordController,

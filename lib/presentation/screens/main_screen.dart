@@ -35,14 +35,14 @@ class _MainScreenState extends State<MainScreen> {
 
   Person? _user;
   bool _showLogin = true;
-  bool _isSessionLoading = true; // TODO que salga imagen de icono centrada en grande
+  bool _isSessionLoading = true;
   
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _loadUserFromLocalSession();
-      await updateLocation();
+      updateLocation();
       setState(() {
         _isSessionLoading = false;
       });
@@ -70,12 +70,12 @@ class _MainScreenState extends State<MainScreen> {
       }
     }
   }
-  // TODO cambiar form de registro para babysitters y añadir fecha de nac en todos
-  // TODO añadir screen de edicion de hijos y detalles
-  // TODO AHORA Editar información personal
+  // TODO añadir screen de edicion y detalles de hijos
   
   void setUser(Person user, {bool saveLocal = true}) async {
     setState(() {
+      currentSection = 'Inicio';
+      _showLogin = true;
       _user = user;
     });
     if (saveLocal) {
@@ -118,16 +118,19 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _user == null
-      ? _showLogin == true
-        ? showLoginSection()
-        : showRegisterSection()
-      : Column(
-        children: [
-          seeMainScreen(),
-          showFooter(),
-        ],
-      ),
+      body: 
+      _isSessionLoading == true
+        ? Center(child: CircleAvatar(radius: 60, backgroundImage: AssetImage('assets/img/logo.png')))
+        : _user == null
+        ? _showLogin == true
+          ? showLoginSection()
+          : showRegisterSection()
+        : Column(
+          children: [
+            seeMainScreen(),
+            showFooter(),
+          ],
+        ),
     );
   }
 
@@ -144,7 +147,7 @@ class _MainScreenState extends State<MainScreen> {
         'Niñeros' => BabysittersSection(parent: _user! as Parent),
         'Solicitudes' => RequestsSection(person: _user!),
         'Historial' => RequestsSection(person: _user!, showingFinishedServices: true),
-        'Opciones' => OptionsSection(person: _user!, onSessionClosed: unsetUser),
+        'Opciones' => OptionsSection(person: _user!, onSessionClosed: unsetUser, setUser: setUser),
         _ => HomeSection(user: _user!, changeSection: _changeSection),
       },
     );
@@ -162,8 +165,10 @@ class _MainScreenState extends State<MainScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _footerIcon('Inicio', FontAwesomeIcons.solidHouse),
-            _footerIcon('Hijo(s)', FontAwesomeIcons.baby),
-            _footerIcon('Niñeros', FontAwesomeIcons.personBreastfeeding),
+            if (_user is Parent) ...[
+              _footerIcon('Hijo(s)', FontAwesomeIcons.baby),
+              _footerIcon('Niñeros', FontAwesomeIcons.personBreastfeeding),
+            ],
             _footerIcon('Solicitudes', FontAwesomeIcons.personCircleQuestion),
             _footerIcon('Opciones', FontAwesomeIcons.gear),
           ]

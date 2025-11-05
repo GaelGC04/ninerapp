@@ -245,9 +245,14 @@ class BabysitterRepository implements IBabysitterRepository {
   @override
   Future<void> updateBabysitter(Babysitter babysitter) async {
     try {
+      final Map<String, dynamic> dataToUpdate = babysitter.toMap();
+      dataToUpdate.remove('password');
+      dataToUpdate.remove('rating');
+      dataToUpdate.remove('amount_ratings');
+
       return await _supabase
         .from('babysitter')
-        .update(babysitter.toMap())
+        .update(dataToUpdate)
         .eq('id', babysitter.id!);
     } on PostgrestException catch (e) {
       throw Exception('Error al actualizar niñero: ${e.message}');
