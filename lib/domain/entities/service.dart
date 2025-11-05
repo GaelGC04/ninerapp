@@ -59,6 +59,7 @@ class Service {
       ratedByBabysitter: map['rated_by_babysitter'] as bool,
       deletedByParent: map['deleted_by_parent'] as bool,
       deletedByBabysitter: map['deleted_by_babysitter'] as bool,
+      children: list
     );
   }
 

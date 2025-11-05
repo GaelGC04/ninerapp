@@ -33,7 +33,7 @@ class Child extends Person {
       physicalDisability: map['physical_disability'] as bool,
       hearingDisability: map['hearing_disability'] as bool,
       visualDisability: map['visual_disability'] as bool,
-      otherDisabilities: map['other_disability'] as String?,
+      otherDisabilities: map['other_disabilities'] as String?,
       lastLatitude: null,
       lastLongitude: null,
     );

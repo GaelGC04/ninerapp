@@ -11,6 +11,7 @@ import 'package:ninerapp/domain/entities/person.dart';
 import 'package:ninerapp/domain/entities/service.dart';
 import 'package:ninerapp/domain/entities/service_status.dart';
 import 'package:ninerapp/domain/repositories/iservice_repository.dart';
+import 'package:ninerapp/presentation/subscreens/service_info.dart';
 
 class ServiceCard extends StatefulWidget {
   final Service service;
@@ -35,11 +36,7 @@ class _ServiceCardState extends State<ServiceCard> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-//        Navigator.of(context).push(
-//          MaterialPageRoute(
-//            builder: (context) => ServiceInfoScreen(service: widget.service),
-//          ),
-//        );
+        showServiceInfo();
       },
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 8),
@@ -54,6 +51,14 @@ class _ServiceCardState extends State<ServiceCard> {
     );
   }
 
+  void showServiceInfo() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ServiceInfoScreen(service: widget.service, parent: widget.person as Parent, babysitter: widget.service.babysitter),
+      ),
+    );
+  }
+
   Row showInfo() {
     return Row(
       children: [
@@ -64,7 +69,7 @@ class _ServiceCardState extends State<ServiceCard> {
               Text('Solicitud para: ${widget.service.babysitter.name.split(" ")[0]} ${widget.service.babysitter.lastName.split(" ")[0]}', style: AppTextstyles.childCardText, maxLines: 1, overflow: TextOverflow.ellipsis),
               Text('${widget.service.paymentWithCard == true ? 'Pago con tarjeta' : 'Pago con efectivo'}: \$${widget.service.totalPrice.toStringAsFixed(2)} mxn', style: AppTextstyles.childCardText, maxLines: 1, overflow: TextOverflow.ellipsis),
               SizedBox(height: 10),
-              Text('FECHA: ${TimeNumberFormat.formatTwoDigits(widget.service.date.day)}/${TimeNumberFormat.getMonthName(widget.service.date.month)}/${widget.service.date.year} - ${widget.service.date.hour}:${widget.service.date.minute}', style: AppTextstyles.childCardText, maxLines: 1, overflow: TextOverflow.ellipsis),
+              Text('FECHA: ${TimeNumberFormat.parseDate(widget.service.date, true, true)}', style: AppTextstyles.childCardText, maxLines: 1, overflow: TextOverflow.ellipsis),
               Text('${widget.service.hours} hora${widget.service.hours == 1 ? '' : 's'}, ${widget.service.minutes} minuto${widget.service.minutes == 1 ? '' : 's'}', style: AppTextstyles.childCardText, maxLines: 1, overflow: TextOverflow.ellipsis),
               SizedBox(height: 10),
               Text('ESTADO: ${widget.service.status}', style: AppTextstyles.childCardText.copyWith(color: AppColors.currentListOption), maxLines: 1, overflow: TextOverflow.ellipsis),

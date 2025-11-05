@@ -4,6 +4,7 @@ import 'package:ninerapp/core/constants/app_shadows.dart';
 import 'package:ninerapp/core/constants/app_textstyles.dart';
 import 'package:ninerapp/domain/entities/child.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:ninerapp/presentation/subscreens/child_info.dart';
 
 class ChildCard extends StatelessWidget {
   final Child child;
@@ -25,7 +26,16 @@ class ChildCard extends StatelessWidget {
     if (child.visualDisability) totalDisabilities++;
     if (child.otherDisabilities != null && child.otherDisabilities!.isNotEmpty) totalDisabilities++;
 
-    return showInfo(totalDisabilities);
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => ChildInfoScreen(child: child),
+          ),
+        );
+      },
+      child: showInfo(totalDisabilities),
+    );
   }
 
   Container showInfo(int totalDisabilities) {

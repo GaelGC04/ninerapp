@@ -110,7 +110,8 @@ Container showInfo() {
                 ],
               ),
             ),
-            const SizedBox(height: 12),
+
+            const SizedBox(height: 25),
 
             GestureDetector(
               onTap: onFavoritePress,
