@@ -7,7 +7,7 @@ import 'package:ninerapp/domain/entities/babysitter.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ninerapp/domain/entities/parent.dart';
 import 'package:ninerapp/domain/repositories/ibabysitter_repository.dart';
-import 'package:ninerapp/presentation/screens/babysitter_info_screen.dart';
+import 'package:ninerapp/presentation/subscreens/babysitter_info_screen.dart';
 
 
 class BabysitterCard extends StatefulWidget {
@@ -91,7 +91,6 @@ Container showInfo() {
 
         const SizedBox(width: 10),
 
-        // COLUMNA DERECHA (Estrellas + Favorito)
         Column(
           children: [
             Container(

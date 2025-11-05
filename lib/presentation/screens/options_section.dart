@@ -74,11 +74,9 @@ class _OptionsSectionState extends State<OptionsSection> {
   void initState() {
     super.initState();
     _loadData();
-    debugPrint("APUNTO DE EJECUTAR IF DE PARENT");
     if (_parent != null) {
       _loadChildren();
     }
-    debugPrint("DESPUES DE EJECUTAR IF DE PARENT");
   }
 
   void _loadData() {
@@ -108,7 +106,7 @@ class _OptionsSectionState extends State<OptionsSection> {
               const SizedBox(height: 20),
               childrenListContent(),
             ],
-            const SizedBox(height: 20),
+            const SizedBox(height: 80),
             AppButton(
               onPressed: () {
                 widget.onSessionClosed();
@@ -127,7 +125,6 @@ class _OptionsSectionState extends State<OptionsSection> {
                 } else if (widget.person is Babysitter) {
                   _babysitterRepository.deleteBabysitter(_babysitter!.id!);
                 }
-                // await deleteBabysitter / Parent
                 widget.onSessionClosed();
               },
               backgroundColor: AppColors.historyColor,
@@ -223,51 +220,61 @@ class _OptionsSectionState extends State<OptionsSection> {
       child: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
-          Text('Hijos', style: AppTextstyles.indexSubtitle, textAlign: TextAlign.center),
-          const SizedBox(height: 10),
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: AppColors.lightGrey,
-              boxShadow: [AppShadows.inputShadow],
-            ),
-            width: double.infinity,
-            padding: EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ...childrenList.map((child) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('${child.name} ${child.lastName}', style: AppTextstyles.bodyText),
-                      Text(child.getAge() <= 0
-                        ? child.getAge() == 0
-                          ? '- Recién nacido'
-                          : '- ${child.getAge().abs()} meses'
-                        : '${child.getAge()} años', style: AppTextstyles.bodyText),
-                      Text(' - ${child.isFemale == true ? 'Niña' : 'Niño'}', style: AppTextstyles.bodyText),
-                      if (childrenList.indexOf(child) != childrenList.length - 1) ...[
-                        const Divider(color: AppColors.fontColor, thickness: 1),
-                      ],
-                    ]
-                  );
-                }),
-                const SizedBox(height: 20),
-                Center(
-                  child: AppButton(
-                    onPressed: (){
-                    },
-                    backgroundColor: AppColors.currentListOption,
-                    textColor: AppColors.white,
-                    text: "Añadir hijo",
-                    icon: null,
-                    coloredBorder: true
+          if (_isLoading == true) ...[
+            const SizedBox(height: 20),
+            const CircularProgressIndicator(color: AppColors.primary),
+            const SizedBox(height: 20),
+          ] else if (_errorMessage != null) ...[
+            const SizedBox(height: 20),
+            Text(_errorMessage!, style: AppTextstyles.bodyText),
+            const SizedBox(height: 20),
+          ] else ...[
+            Text('Hijos', style: AppTextstyles.indexSubtitle, textAlign: TextAlign.center),
+            const SizedBox(height: 10),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: AppColors.lightGrey,
+                boxShadow: [AppShadows.inputShadow],
+              ),
+              width: double.infinity,
+              padding: EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ...childrenList.map((child) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('${child.name} ${child.lastName}', style: AppTextstyles.bodyText),
+                        Text(child.getAge() <= 0
+                          ? child.getAge() == 0
+                            ? '- Recién nacido'
+                            : '- ${child.getAge().abs()} meses'
+                          : '${child.getAge()} años', style: AppTextstyles.bodyText),
+                        Text(' - ${child.isFemale == true ? 'Niña' : 'Niño'}', style: AppTextstyles.bodyText),
+                        if (childrenList.indexOf(child) != childrenList.length - 1) ...[
+                          const Divider(color: AppColors.fontColor, thickness: 1),
+                        ],
+                      ]
+                    );
+                  }),
+                  const SizedBox(height: 20),
+                  Center(
+                    child: AppButton(
+                      onPressed: (){
+                      },
+                      backgroundColor: AppColors.currentListOption,
+                      textColor: AppColors.white,
+                      text: "Añadir hijo",
+                      icon: null,
+                      coloredBorder: true
+                    ),
                   ),
-                ),
-              ],
-            ),
-          )
+                ],
+              ),
+            )
+          ],
         ],
       ),
     );
