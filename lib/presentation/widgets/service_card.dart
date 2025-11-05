@@ -54,7 +54,7 @@ class _ServiceCardState extends State<ServiceCard> {
   void showServiceInfo() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => ServiceInfoScreen(service: widget.service, parent: widget.person as Parent, babysitter: widget.service.babysitter),
+        builder: (context) => ServiceInfoScreen(service: widget.service, parent: widget.service.parent, babysitter: widget.service.babysitter, person: widget.person),
       ),
     );
   }
@@ -66,7 +66,11 @@ class _ServiceCardState extends State<ServiceCard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Solicitud para: ${widget.service.babysitter.name.split(" ")[0]} ${widget.service.babysitter.lastName.split(" ")[0]}', style: AppTextstyles.childCardText, maxLines: 1, overflow: TextOverflow.ellipsis),
+              if (widget.person is Parent) ...[
+                Text('Solicitud para: ${widget.service.babysitter.name.split(" ")[0]} ${widget.service.babysitter.lastName.split(" ")[0]}', style: AppTextstyles.childCardText, maxLines: 1, overflow: TextOverflow.ellipsis),
+              ] else if (widget.person is Babysitter) ...[
+                Text('Solicitud de: ${widget.service.parent.name.split(" ")[0]} ${widget.service.parent.lastName.split(" ")[0]}', style: AppTextstyles.childCardText, maxLines: 1, overflow: TextOverflow.ellipsis),
+              ],
               Text('${widget.service.paymentWithCard == true ? 'Pago con tarjeta' : 'Pago con efectivo'}: \$${widget.service.totalPrice.toStringAsFixed(2)} mxn', style: AppTextstyles.childCardText, maxLines: 1, overflow: TextOverflow.ellipsis),
               SizedBox(height: 10),
               Text('FECHA: ${TimeNumberFormat.parseDate(widget.service.date, true, true)}', style: AppTextstyles.childCardText, maxLines: 1, overflow: TextOverflow.ellipsis),
@@ -118,20 +122,20 @@ class _ServiceCardState extends State<ServiceCard> {
                 SizedBox(
                   height: 35, width: 35,
                   child: IconButton(
-                    icon: Icon(FontAwesomeIcons.ban, color: AppColors.red, size: 20),
+                    icon: Icon(FontAwesomeIcons.circleCheck, color: AppColors.green, size: 20),
                     onPressed: (){
-                      changeStatus(widget.service.id!, ServiceStatus.canceled.value);
-                    }, tooltip: "Rechazar servicio", hoverColor: AppColors.invisible, color: AppColors.invisible
+                      changeStatus(widget.service.id!, ServiceStatus.accepted.value);
+                    }, tooltip: "Aceptar servicio", hoverColor: AppColors.invisible, color: AppColors.invisible
                   ),
                 ),
                 SizedBox(height: 5),
                 SizedBox(
                   height: 35, width: 35,
                   child: IconButton(
-                    icon: Icon(FontAwesomeIcons.circleCheck, color: AppColors.green, size: 20),
+                    icon: Icon(FontAwesomeIcons.ban, color: AppColors.red, size: 20),
                     onPressed: (){
                       changeStatus(widget.service.id!, ServiceStatus.canceled.value);
-                    }, tooltip: "Aceptar servicio", hoverColor: AppColors.invisible, color: AppColors.invisible
+                    }, tooltip: "Rechazar servicio", hoverColor: AppColors.invisible, color: AppColors.invisible
                   ),
                 ),
               ],

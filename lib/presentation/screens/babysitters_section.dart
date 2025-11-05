@@ -35,7 +35,7 @@ class _BabysittersSectionState extends State<BabysittersSection> {
   int minExpYears = 0;
   int maxExpYears = 100;
   int minPricePerHour = 0;
-  int maxPricePerHour = 10000;
+  int maxPricePerHour = 1000;
   bool hasPhysicalDisabilityExp = false;
   bool hasVisualDisabilityExp = false;
   bool hasHearingDisabilityExp = false;

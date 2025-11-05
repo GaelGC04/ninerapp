@@ -8,21 +8,25 @@ import 'package:ninerapp/dependency_inyection.dart';
 import 'package:ninerapp/domain/entities/babysitter.dart';
 import 'package:ninerapp/domain/entities/child.dart';
 import 'package:ninerapp/domain/entities/parent.dart';
+import 'package:ninerapp/domain/entities/person.dart';
 import 'package:ninerapp/domain/entities/service.dart';
 import 'package:ninerapp/domain/repositories/iservice_repository.dart';
+import 'package:ninerapp/presentation/subscreens/chat.dart';
 import 'package:ninerapp/presentation/subscreens/child_info.dart';
 import 'package:ninerapp/presentation/widgets/app_button.dart';
 
 class ServiceInfoScreen extends StatefulWidget {
-  final Babysitter babysitter;
-  final Parent parent;
+  final Person person;
   final Service service;
+  final Parent parent;
+  final Babysitter babysitter;
 
   const ServiceInfoScreen({
     super.key,
-    required this.babysitter,
-    required this.parent,
+    required this.person,
     required this.service,
+    required this.parent,
+    required this.babysitter,
   });
 
   @override
@@ -78,9 +82,15 @@ class _ServiceInfoScreenState extends State<ServiceInfoScreen> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               if (_isLoading == true) ...[
-                Expanded(child: Center(child: CircularProgressIndicator(color: AppColors.primary)))
+                SizedBox(
+                  height: MediaQuery.of(context).size.height,
+                  child: Center(child: CircularProgressIndicator(color: AppColors.primary))
+                )
               ] else if (_errorMessage != null) ...[
-                Expanded(child: Center(child: Text(_errorMessage!, style: AppTextstyles.appBarText.copyWith(color: AppColors.red), textAlign: TextAlign.center)))
+                SizedBox(
+                  height: MediaQuery.of(context).size.height,
+                  child: Center(child: Text(_errorMessage!, style: AppTextstyles.appBarText.copyWith(color: AppColors.red), textAlign: TextAlign.center))
+                )
               ] else ...[
                 const SizedBox(height: 20),
                 Container(
@@ -95,8 +105,13 @@ class _ServiceInfoScreenState extends State<ServiceInfoScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text("Niñero:", textAlign: TextAlign.start, style: AppTextstyles.bodyText),
-                                Text(" - ${widget.babysitter.name} ${widget.babysitter.lastName}", textAlign: TextAlign.start, style: AppTextstyles.bodyText, maxLines: 1, overflow: TextOverflow.ellipsis),
+                                if (widget.person is Parent) ...[
+                                  Text("${widget.babysitter.isFemale == true ? 'Niñera' : 'Niñero'}:", textAlign: TextAlign.start, style: AppTextstyles.bodyText),
+                                  Text(" - ${widget.babysitter.name} ${widget.babysitter.lastName}", textAlign: TextAlign.start, style: AppTextstyles.bodyText, maxLines: 1, overflow: TextOverflow.ellipsis),
+                                ] else if (widget.person is Babysitter) ...[
+                                  Text("${widget.parent.isFemale == true ? 'Madre' : 'Padre'}:", textAlign: TextAlign.start, style: AppTextstyles.bodyText),
+                                  Text(" - ${widget.parent.name} ${widget.parent.lastName}", textAlign: TextAlign.start, style: AppTextstyles.bodyText, maxLines: 1, overflow: TextOverflow.ellipsis),
+                                ],
                               ],
                             ),
                           ),
@@ -238,7 +253,11 @@ class _ServiceInfoScreenState extends State<ServiceInfoScreen> {
   }
 
   void showServiceChat() {
-
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ChatScreen(parent: widget.parent, babysitter: widget.babysitter, currentUserIsParent: widget.person is Parent),
+      ),
+    );
   }
 
   void showChildInfo(Child child) {

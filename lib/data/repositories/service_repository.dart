@@ -118,24 +118,28 @@ class ServiceRepository implements IServiceRepository {
         .eq('deleted_by_babysitter', false)
         .order('date', ascending: true);
 
-      for (var service in response) {
-        if (isFinished == true && (service['status'] == 'Completado' || service['status'] == 'Rechazado')) {
-          response.remove(service);
-        } else if (isFinished == false && service['status'] != 'Completado' && service['status'] != 'Rechazado') {
-          response.remove(service);
-        }
-      }
-
       final List<Service> services = (response as List)
         .map((service) {
           return Service.fromMap({
             ...service,
-            'parent': service!['parent'],
+            'parent': service['parent'],
             'babysitter': service['babysitter'],
           }, []);
         }).toList();
 
-      return services;
+        if (isFinished == true) {
+          final filteredServices = services.where((service) =>
+            service.status == ServiceStatus.completed.value ||
+            service.status == ServiceStatus.rejected.value ||
+            service.status == ServiceStatus.canceled.value).toList();
+          return filteredServices;
+        } else {
+          final filteredServices = services.where((service) =>
+            service.status != ServiceStatus.completed.value &&
+            service.status != ServiceStatus.rejected.value &&
+            service.status != ServiceStatus.canceled.value).toList();
+          return filteredServices;
+        }
     } on PostgrestException catch (e) {
       throw Exception('Error al obtener servicios: ${e.message}');
     } catch (e) {

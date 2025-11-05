@@ -9,6 +9,7 @@ import 'package:ninerapp/core/constants/app_colors.dart';
 import 'package:ninerapp/core/constants/app_textstyles.dart';
 import 'package:ninerapp/core/util/time_number_format.dart';
 import 'package:ninerapp/core/util/location_service.dart';
+import 'package:ninerapp/data/services/email_service.dart';
 import 'package:ninerapp/dependency_inyection.dart';
 import 'package:ninerapp/domain/entities/babysitter.dart';
 import 'package:ninerapp/domain/entities/child.dart';
@@ -39,6 +40,7 @@ class RequestBabysitterScreen extends StatefulWidget {
 }
 
 class _RequestBabysitterScreenState extends State<RequestBabysitterScreen> {
+  final EmailService _emailService = getIt<EmailService>();
   final IServiceRepository _serviceRepository = getIt<IServiceRepository>();
   final IBabysitterRepository _babysitterRepository = getIt<IBabysitterRepository>();
   final IChildRepository _childRepository = getIt<IChildRepository>();
@@ -419,11 +421,101 @@ class _RequestBabysitterScreenState extends State<RequestBabysitterScreen> {
       }
     }
     await _serviceRepository.addService(newService).whenComplete(() {
+      sendBabysitterServiceMail(newService);
+      sendParentServiceMail(newService);
+
+      if (_selectedPaymentMethod == "Tarjeta") {
+        sendBabysitterPaymentMail(newService);
+        sendParentPaymentMail(newService);
+      }
+      
       if (!mounted) return;
-      // ignore: use_build_context_synchronously
       Navigator.of(context).pop();
       widget.onRequest();
     });
+  }
+
+  void sendBabysitterPaymentMail(Service newService) async {
+    await _emailService.sendEmail(
+      recipientEmail: newService.babysitter.email,
+      subject: "Comprobante de pago",
+      bodyHtml: """
+        <h1>¡Hola ${newService.babysitter.name}!</h1>
+        <p>El servicio de ${newService.parent.isFemale ? 'la usuaria' : 'el usuario'} ${newService.parent.name} ${newService.parent.lastName} ha sido pagado con tarjeta.</p>
+        <h2>Detalles del pago:</h2>
+        <ul>
+          <li>Pago: \$${newService.totalPrice.toStringAsFixed(2)} MXN (Pagado con Tarjeta).</li>
+          <li>Fecha y hora del pago: ${TimeNumberFormat.parseDate(DateTime.now(), true, true)}.</li>
+        </ul>
+        <p>Posteriormente se pagará el servicio a su cuenta.</p>
+        <h1>NiñerApp.</h1>
+      """,
+    );
+  }
+
+  void sendParentPaymentMail(Service newService) async {
+    await _emailService.sendEmail(
+      recipientEmail: newService.babysitter.email,
+      subject: "Comprobante de pago",
+      bodyHtml: """
+        <h1>¡Hola ${newService.parent.name}!</h1>
+        <p>Este es tu comprobante de pago por el servicio solicitado a ${newService.babysitter.isFemale ? 'la niñera' : 'el niñero'} ${newService.babysitter.name} ${newService.babysitter.lastName} que pagaste con tarjeta.</p>
+        <h2>Detalles del pago:</h2>
+        <ul>
+          <li>Pago: \$${newService.totalPrice.toStringAsFixed(2)} MXN (Pagado con Tarjeta).</li>
+          <li>Fecha y hora del pago: ${TimeNumberFormat.parseDate(DateTime.now(), true, true)}.</li>
+        </ul>
+        <h1>NiñerApp.</h1>
+      """,
+    );
+  }
+
+  void sendBabysitterServiceMail(Service newService) async {
+    final String serviceDate = TimeNumberFormat.parseDate(newService.date, true, true);
+    final String childrenNames = newService.children.map((c) => c.name).join(', ');
+    
+    await _emailService.sendEmail(
+      recipientEmail: newService.babysitter.email,
+      subject: "¡Tienes una nueva solicitud!",
+      bodyHtml: """
+        <h1>¡Hola ${newService.babysitter.name}!</h1>
+        <p>${newService.parent.isFemale ? 'La usuaria' : 'El usuario'} ${newService.parent.name} ${newService.parent.lastName} ha solicitado tus servicios.</p>
+        <h2>Detalles del servicio:</h2>
+        <ul>
+          <li>Fecha y hora: $serviceDate</li>
+          <li>Duración: ${newService.hours} hora(s) y ${newService.minutes} minuto(s)</li>
+          <li>Niño(s) a cuidar (${newService.children.length}): $childrenNames</li>
+          <li>Pago: \$${newService.totalPrice.toStringAsFixed(2)} MXN (${newService.paymentWithCard ? 'Pagado con Tarjeta' : 'Pendiente en Efectivo'})</li>
+          <li>Instrucciones: ${newService.instructions ?? 'No hay instrucciones adicionales.'}</li>
+        </ul>
+        <p>Por favor, revisa tus Solicitudes en la aplicación para aceptar o rechazar el servicio.</p>
+        <h1>NiñerApp.</h1>
+      """,
+    );
+  }
+
+  void sendParentServiceMail(Service newService) async {
+    final String serviceDate = TimeNumberFormat.parseDate(newService.date, true, true);
+    final String childrenNames = newService.children.map((c) => c.name).join(', ');
+    
+    await _emailService.sendEmail(
+      recipientEmail: newService.parent.email,
+      subject: "¡Has realizado una solicitud!",
+      bodyHtml: """
+        <h1>¡Hola ${newService.parent.name}!</h1>
+        <p>Hiciste una solicitud de servicio para ${newService.babysitter.isFemale ? 'la niñera' : 'el niñero'} ${newService.babysitter.name} ${newService.babysitter.lastName}.</p>
+        <h2>Detalles del servicio:</h2>
+        <ul>
+          <li>Fecha y hora: $serviceDate</li>
+          <li>Duración: ${newService.hours} hora(s) y ${newService.minutes} minuto(s)</li>
+          <li>Niño(s) a cuidar (${newService.children.length}): $childrenNames</li>
+          <li>Pago: \$${newService.totalPrice.toStringAsFixed(2)} MXN (${newService.paymentWithCard ? 'Pagado con Tarjeta' : 'Pendiente en Efectivo'})</li>
+          <li>Instrucciones: ${newService.instructions ?? 'No hay instrucciones adicionales.'}</li>
+        </ul>
+        <p>Por favor, permanece al pendiente de el estado de tu solicitud en la aplicación dentro de la sección Solicitudes.</p>
+        <h1>NiñerApp.</h1>
+      """,
+    );
   }
 
   Future<bool> makeStripePayment(bool paymentSuccess) async {
@@ -472,6 +564,9 @@ class _RequestBabysitterScreenState extends State<RequestBabysitterScreen> {
                 controller: _minutesController,
                 hintText: "Minutos",
                 validation: () {
+                  if (int.tryParse(_minutesController.text) != null && int.parse(_minutesController.text) > 59) {
+                    _minutesController.text = "59";
+                  }
                   setState(() {
                     _formIsValid = (_serviceDateText.isNotEmpty && _hoursController.text.isNotEmpty && _minutesController.text.isNotEmpty && childrenList.values.any((value) => value == true));
                   });
