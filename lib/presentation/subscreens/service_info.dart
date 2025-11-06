@@ -255,7 +255,7 @@ class _ServiceInfoScreenState extends State<ServiceInfoScreen> {
   void showServiceChat() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => ChatScreen(parent: widget.parent, babysitter: widget.babysitter, currentUserIsParent: widget.person is Parent),
+        builder: (context) => ChatScreen(parent: widget.parent, babysitter: widget.babysitter, currentUserIsParent: widget.person is Parent, service: widget.service),
       ),
     );
   }

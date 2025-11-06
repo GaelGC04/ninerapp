@@ -2,23 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ninerapp/core/constants/app_colors.dart';
 import 'package:ninerapp/core/constants/app_textstyles.dart';
+import 'package:ninerapp/dependency_inyection.dart';
 import 'package:ninerapp/domain/entities/babysitter.dart';
 import 'package:ninerapp/domain/entities/parent.dart';
+import 'package:ninerapp/domain/entities/service.dart';
+import 'package:ninerapp/domain/repositories/ichat_repository.dart';
 import 'package:ninerapp/presentation/widgets/app_text_field.dart';
-import 'dart:async';
-
 import 'package:ninerapp/presentation/widgets/message_bubble.dart';
+import 'dart:async';
 
 class ChatScreen extends StatefulWidget {
   final bool currentUserIsParent;
   final Parent parent;
   final Babysitter babysitter;
+  final Service service;
 
   const ChatScreen({
     super.key,
     required this.currentUserIsParent,
     required this.parent,
     required this.babysitter,
+    required this.service,
   });
 
   @override
@@ -26,13 +30,13 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  final IChatRepository _chatRepository = getIt<IChatRepository>();
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
-  final Map<int, String> _babysitterMessages = {1: 'Hola de niñero'};
-  final Map<int, String> _parentMessages = {2: 'Hola de padre'};
+  Map<int, String> _babysitterMessages = {};
+  Map<int, String> _parentMessages = {};
 
-  bool _isLoading = false;
   String _errorMessage = "";
 
   Timer? _pollingTimer;
@@ -40,50 +44,50 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
+    loadMessages();
     _startMessagePolling();
   }
 
   void _startMessagePolling() {
     _pollingTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      // if (mounted) loadMessages();
+      loadMessages();
       
       _scrollToBottom();
     });
   }
 
-  void loadMessages() {
+  void loadMessages() async {
     setState(() {
-      _isLoading = true;
       _errorMessage = "";
     });
     
     try {
-      // final messages = await _chatRepository.getMessages(widget.service.id!);
-       // TODO obtneer mensajes de bd
+      final parentMessages = await _chatRepository.getMessages(widget.service, true);
+      final babysitterMessages = await _chatRepository.getMessages(widget.service, false);
       setState(() {
-        _isLoading = false;
+        _parentMessages = parentMessages;
+        _babysitterMessages = babysitterMessages;
       });
     } catch (e) {
       if (mounted) {
         setState(() {
           _errorMessage = 'Error al cargar el chat: ${e.toString()}';
-          _isLoading = false;
         });
       }
     }
   }
 
-  void _sendMessage() {
+  void _sendMessage() async {
     final text = _messageController.text.trim();
     if (text.isEmpty) return;
 
+    int messageId = await _chatRepository.postMessage(widget.service, text, widget.currentUserIsParent);
+
     setState(() {
       if (widget.currentUserIsParent) {
-        final newId = [..._parentMessages.keys, ..._babysitterMessages.keys].reduce((a, b) => a > b ? a : b) + 1;
-        _parentMessages[newId] = text;
+        _parentMessages[messageId] = text;
       } else {
-        final newId = [..._parentMessages.keys, ..._babysitterMessages.keys].reduce((a, b) => a > b ? a : b) + 1;
-        _babysitterMessages[newId] = text;
+        _babysitterMessages[messageId] = text;
       }
       
       _messageController.clear();
@@ -128,28 +132,26 @@ class _ChatScreenState extends State<ChatScreen> {
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: _isLoading
-                ? Center(child: CircularProgressIndicator(color: AppColors.currentSectionColor))
-                : _errorMessage.isNotEmpty
-                  ? Center(child: Text(_errorMessage, style: AppTextstyles.bodyText.copyWith(color: AppColors.red), textAlign: TextAlign.center))
-                  : ListView.builder(
-                      controller: _scrollController,
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      itemCount: sortedKeys.length,
-                      itemBuilder: (context, index) {
-                        final key = sortedKeys[index];
-                        final message = allMessages[key]!;
-                        
-                        final isCurrentUserMessage = widget.currentUserIsParent == true
-                          ? _parentMessages.containsKey(key)
-                          : _babysitterMessages.containsKey(key);
+              child: _errorMessage.isNotEmpty
+                ? Center(child: Text(_errorMessage, style: AppTextstyles.bodyText.copyWith(color: AppColors.red), textAlign: TextAlign.center))
+                : ListView.builder(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  itemCount: sortedKeys.length,
+                  itemBuilder: (context, index) {
+                    final key = sortedKeys[index];
+                    final message = allMessages[key]!;
+                    
+                    final isCurrentUserMessage = widget.currentUserIsParent == true
+                      ? _parentMessages.containsKey(key)
+                      : _babysitterMessages.containsKey(key);
 
-                        return MessageBubble(
-                          message: message,
-                          isSender: isCurrentUserMessage,
-                        );
-                      },
-                    ),
+                    return MessageBubble(
+                      message: message,
+                      isSender: isCurrentUserMessage,
+                    );
+                  },
+                ),
             ),
           ),
           Container(

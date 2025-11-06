@@ -1,8 +1,10 @@
 import 'package:get_it/get_it.dart';
+import 'package:ninerapp/data/repositories/chat_repository.dart';
 import 'package:ninerapp/data/repositories/parent_repository.dart';
 import 'package:ninerapp/data/repositories/service_repository.dart';
 import 'package:ninerapp/data/services/email_service.dart';
 import 'package:ninerapp/data/services/local_auth_service.dart';
+import 'package:ninerapp/domain/repositories/ichat_repository.dart';
 import 'package:ninerapp/domain/repositories/iparent_repository.dart';
 import 'package:ninerapp/domain/repositories/iservice_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -25,4 +27,5 @@ void setupDependencies() {
   getIt.registerSingleton<IBabysitterRepository>(BabysitterRepository(supabase: getIt<SupabaseClient>()));
   getIt.registerSingleton<IServiceRepository>(ServiceRepository(supabase: getIt<SupabaseClient>()));
   getIt.registerSingleton<IParentRepository>(ParentRepository(supabase: getIt<SupabaseClient>()));
+  getIt.registerSingleton<IChatRepository>(ChatRepository(supabase: getIt<SupabaseClient>()));
 }
