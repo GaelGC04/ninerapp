@@ -70,7 +70,6 @@ class _MainScreenState extends State<MainScreen> {
       }
     }
   }
-  // TODO añadir screen de edicion de hijos
   
   void setUser(Person user, {bool saveLocal = true}) async {
     setState(() {

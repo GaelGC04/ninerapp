@@ -1,5 +1,8 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:ninerapp/core/constants/app_colors.dart';
 import 'package:ninerapp/core/constants/app_shadows.dart';
 import 'package:ninerapp/core/constants/app_textstyles.dart';
@@ -38,11 +41,36 @@ class _ServiceInfoScreenState extends State<ServiceInfoScreen> {
   bool _isLoading = true;
   String? _errorMessage;
   late Service serviceUpdated;
+  
+  LatLng _currentLocation = LatLng(22.769684, -102.576787);
+  final Set<Marker> _markers = {};
+  late GoogleMapController _mapController;
 
   @override
   void initState() {
     super.initState();
     loadService();
+  }
+
+  void _getLocation() async {
+    final LatLng newLocation = LatLng(widget.service.latitude, widget.service.longitude);
+
+    setState(() {
+      _currentLocation = newLocation;
+      _mapController.animateCamera(
+        CameraUpdate.newLatLng(_currentLocation),
+      );
+
+      _markers.add(
+        Marker(
+          markerId: MarkerId('currentLocation'),
+          position: _currentLocation,
+          infoWindow: InfoWindow(
+            title: 'Ubicación del servicio',
+          ),
+        ),
+      );
+    });
   }
 
   Future<void> loadService() async {
@@ -185,11 +213,59 @@ class _ServiceInfoScreenState extends State<ServiceInfoScreen> {
                           }),
                         ],
                       ),
+                      const SizedBox(height: 15),
+                      SizedBox(
+                        width: double.infinity,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text("Costo total del servicio: \$${widget.service.totalPrice.toStringAsFixed(2)} mxn por 2 horas", textAlign: TextAlign.center, style: AppTextstyles.indexSubtitle.copyWith(color: AppColors.currentSectionColor)),
+                            if (widget.service.paymentWithCard == true) ...[
+                              Text("Pagado con tarjeta", textAlign: TextAlign.center, style: AppTextstyles.indexSubtitle.copyWith(color: AppColors.currentSectionColor)),
+                            ] else ...[
+                              Text("Pagar en efectivo al recoger a los niños", textAlign: TextAlign.center, style: AppTextstyles.indexSubtitle.copyWith(color: AppColors.currentSectionColor)),
+                            ],
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 15),
+                      SizedBox(
+                        width: double.infinity,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Ubicación del servicio:", textAlign: TextAlign.start, style: AppTextstyles.bodyText),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        height: 350,
+                        width: double.infinity,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(15),
+                          child: GoogleMap(
+                            initialCameraPosition: CameraPosition(target: _currentLocation, zoom: 17),
+                            markers: _markers,
+                            onMapCreated: (GoogleMapController controller) {
+                              _mapController = controller;
+                              _getLocation();
+                            },
+                            gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+                              Factory<OneSequenceGestureRecognizer>(() => EagerGestureRecognizer()),
+                              Factory<PanGestureRecognizer>(() => PanGestureRecognizer()),
+                              Factory<ScaleGestureRecognizer>(() => ScaleGestureRecognizer()),
+                            },
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ],
-              const SizedBox(height: 60),
+              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [

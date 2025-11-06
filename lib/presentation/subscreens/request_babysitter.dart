@@ -637,7 +637,9 @@ class _RequestBabysitterScreenState extends State<RequestBabysitterScreen> {
           ] else ...[
             CircleAvatar(
               radius: 25,
-              backgroundImage: AssetImage('assets/img/babysitter.png'), // HACER poner imagen respectiva del niñero real guardada en supabase
+              backgroundImage: widget.babysitter.profileImageUrl != null
+                ? NetworkImage(widget.babysitter.profileImageUrl!)
+                : const AssetImage('assets/img/babysitter.png') as ImageProvider,
             ),
             const SizedBox(width: 30),
             Expanded(

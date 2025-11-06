@@ -11,7 +11,7 @@ import 'package:ninerapp/domain/entities/person.dart';
 import 'package:ninerapp/domain/repositories/ibabysitter_repository.dart';
 import 'package:ninerapp/domain/repositories/ichild_repository.dart';
 import 'package:ninerapp/domain/repositories/iparent_repository.dart';
-import 'package:ninerapp/presentation/subscreens/edit_user_screen.dart';
+import 'package:ninerapp/presentation/subscreens/edit_user.dart';
 import 'package:ninerapp/presentation/widgets/app_button.dart';
 
 class OptionsSection extends StatefulWidget {
@@ -259,18 +259,6 @@ class _OptionsSectionState extends State<OptionsSection> {
                       ]
                     );
                   }),
-                  const SizedBox(height: 20),
-                  Center(
-                    child: AppButton(
-                      onPressed: (){
-                      },
-                      backgroundColor: AppColors.currentListOption,
-                      textColor: AppColors.white,
-                      text: "Añadir hijo",
-                      icon: null,
-                      coloredBorder: true
-                    ),
-                  ),
                 ],
               ),
             )

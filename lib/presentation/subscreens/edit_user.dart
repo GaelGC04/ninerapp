@@ -42,6 +42,7 @@ class _EditUserScreenState extends State<EditUserScreen> {
   final TextEditingController _birthdateController = TextEditingController();
   final TextEditingController _pricePerHourController = TextEditingController();
   final TextEditingController _experienceYearsController = TextEditingController();
+  final TextEditingController _profileImageUrlController = TextEditingController();
   String _birthdateText = "";
   bool _isFemale = true;
 
@@ -67,22 +68,27 @@ class _EditUserScreenState extends State<EditUserScreen> {
       _lastNameController.text = _parent!.lastName;
       _emailController.text = _parent!.email;
       _birthdateController.text = TimeNumberFormat.parseDate(_parent!.birthdate!, false, false);
-      _birthdateText = _parent!.birthdate.toString();
-      _isFemale = _parent!.isFemale;
+      _birthdateText = "${_parent!.birthdate!.day}-${_parent!.birthdate!.month}-${_parent!.birthdate!.year}";
+      setState(() {
+        _isFemale = _parent!.isFemale;
+      });
     } else if (widget.person is Babysitter) {
       _babysitter = widget.person as Babysitter;
       _nameController.text = _babysitter!.name;
       _lastNameController.text = _babysitter!.lastName;
       _emailController.text = _babysitter!.email;
       _birthdateController.text = TimeNumberFormat.parseDate(_babysitter!.birthdate!, false, false);
-      _birthdateText = _babysitter!.birthdate.toString();
+      _birthdateText = "${_babysitter!.birthdate!.day}-${_babysitter!.birthdate!.month}-${_babysitter!.birthdate!.year}";
       _pricePerHourController.text = _babysitter!.pricePerHour.toString();
       _experienceYearsController.text = (DateTime.now().year - _babysitter!.workStartYear!).toString();
-      _isFemale = _babysitter!.isFemale;
+      setState(() {
+        _isFemale = _babysitter!.isFemale;
+      });
       _expPhysicalDisability = _babysitter!.expPhysicalDisability;
       _expHearingDisability = _babysitter!.expHearingDisability;
       _expVisualDisability = _babysitter!.expVisualDisability;
       _otherDisabilitiesController.text = _babysitter!.expOtherDisabilities ?? "";
+      _profileImageUrlController.text = _babysitter!.profileImageUrl ?? "";
     }
   }
 
@@ -95,6 +101,7 @@ class _EditUserScreenState extends State<EditUserScreen> {
     _pricePerHourController.dispose();
     _experienceYearsController.dispose();
     _otherDisabilitiesController.dispose();
+    _profileImageUrlController.dispose();
     super.dispose();
   }
 
@@ -234,34 +241,6 @@ class _EditUserScreenState extends State<EditUserScreen> {
 
             if (widget.person is Babysitter) ...[
               const SizedBox(height: 20),
-              Text("Experiencia en discapacidades:", style: AppTextstyles.bodyText),
-              const SizedBox(height: 8),
-              _buildCheckboxListTile('Física', _expPhysicalDisability, (bool? value) {
-                setState(() {
-                  _expPhysicalDisability = value!;
-                });
-              }),
-              _buildCheckboxListTile('Auditiva', _expHearingDisability, (bool? value) {
-                setState(() {
-                  _expHearingDisability = value!;
-                });
-              }),
-              _buildCheckboxListTile('Visual', _expVisualDisability, (bool? value) {
-                setState(() {
-                  _expVisualDisability = value!;
-                });
-              }),
-              const SizedBox(height: 10),
-
-              Text("Otra(s):", style: AppTextstyles.bodyText),
-              const SizedBox(height: 8),
-              AppTextField(
-                controller: _otherDisabilitiesController,
-                hintText: 'Ingresar otra(s) discapacidad(es)',
-                validation: () {},
-              ),
-              const SizedBox(height: 20),
-
               Text('Precio por hora: *', style: AppTextstyles.bodyText),
               const SizedBox(height: 8),
               AppTextField(
@@ -290,6 +269,42 @@ class _EditUserScreenState extends State<EditUserScreen> {
                 inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*'))],
               ),
               const SizedBox(height: 20),
+
+              Text('URL de imagen de perfil: *', style: AppTextstyles.bodyText),
+              const SizedBox(height: 8),
+              AppTextField(
+                controller: _profileImageUrlController,
+                hintText: "Ingresar url de imagen de perfil",
+                validation: (){}
+              ),
+              const SizedBox(height: 20),
+
+              Text("Experiencia en discapacidades:", style: AppTextstyles.bodyText),
+              const SizedBox(height: 8),
+              _buildCheckboxListTile('Física', _expPhysicalDisability, (bool? value) {
+                setState(() {
+                  _expPhysicalDisability = value!;
+                });
+              }),
+              _buildCheckboxListTile('Auditiva', _expHearingDisability, (bool? value) {
+                setState(() {
+                  _expHearingDisability = value!;
+                });
+              }),
+              _buildCheckboxListTile('Visual', _expVisualDisability, (bool? value) {
+                setState(() {
+                  _expVisualDisability = value!;
+                });
+              }),
+              const SizedBox(height: 10),
+
+              Text("Otra(s):", style: AppTextstyles.bodyText),
+              const SizedBox(height: 8),
+              AppTextField(
+                controller: _otherDisabilitiesController,
+                hintText: 'Ingresar otra(s) discapacidad(es)',
+                validation: () {},
+              ),
             ],
 
             if (_emailIsRegistered == true) ...[
@@ -327,7 +342,7 @@ class _EditUserScreenState extends State<EditUserScreen> {
         });
         return;
       }
-      
+
       final DateTime newBirthdate = DateFormat('dd-MM-yyyy').parse(_birthdateText.trim());
       if (widget.person is Parent) {
         newParent = Parent(
@@ -362,8 +377,9 @@ class _EditUserScreenState extends State<EditUserScreen> {
           expOtherDisabilities: _otherDisabilitiesController.text.isNotEmpty ? _otherDisabilitiesController.text : null,
           lastLatitude: widget.person.lastLatitude,
           lastLongitude: widget.person.lastLongitude,
-          rating: 0,
-          amountRatings: 0,
+          rating: _babysitter!.rating,
+          amountRatings: _babysitter!.amountRatings,
+          profileImageUrl: _profileImageUrlController.text.trim().isEmpty ? null : _profileImageUrlController.text.trim(),
         );
       }
       if (widget.person is Parent) {
@@ -428,7 +444,7 @@ class _EditUserScreenState extends State<EditUserScreen> {
       setState(() {
         _birthdateController.text = "${TimeNumberFormat.formatTwoDigits(picked.day)}-${TimeNumberFormat.getMonthName(picked.month)}-${picked.year}";
         _birthdateText = "${picked.day}-${picked.month}-${picked.year}";
-        _formIsValid = (_nameController.text.isNotEmpty && _lastNameController.text.isNotEmpty && _birthdateText.isNotEmpty);
+        _validateForm();
       });
     }
   }
