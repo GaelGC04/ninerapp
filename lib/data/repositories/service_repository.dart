@@ -54,7 +54,7 @@ class ServiceRepository implements IServiceRepository {
         if (service.deletedByBabysitter == false) {
           await _supabase
             .from('service')
-            .update({'deleted_by_parent': true})
+            .update({'deleted_by_babysitter': true})
             .eq('id', id);
           return;
         }
