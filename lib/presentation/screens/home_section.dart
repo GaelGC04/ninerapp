@@ -113,9 +113,9 @@ class _HomeSectionState extends State<HomeSection> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text("${widget.user.name.split(" ")[0][0].toUpperCase()+widget.user.name.split(" ")[0].substring(1)} ${widget.user.lastName.split(" ")[0][0].toUpperCase()+widget.user.lastName.split(" ")[0].substring(1)}", style: AppTextstyles.indexTitle, textAlign: TextAlign.center),
-                SizedBox(height: 25),
-                Text("x hijos registrados", style: AppTextstyles.indexSubtitle, textAlign: TextAlign.center),
-                Text("y servicios contratados", style: AppTextstyles.indexSubtitle, textAlign: TextAlign.center)
+//                SizedBox(height: 25),
+//                Text("x hijos registrados", style: AppTextstyles.indexSubtitle, textAlign: TextAlign.center),
+//                Text("y servicios contratados", style: AppTextstyles.indexSubtitle, textAlign: TextAlign.center)
               ],
             ),
           ),

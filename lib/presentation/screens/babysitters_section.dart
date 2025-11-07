@@ -158,7 +158,7 @@ class _BabysittersSectionState extends State<BabysittersSection> {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: IconButton(
-                onPressed: showFilterWindow,
+                onPressed: openFiltersWindow,
                 icon: Icon(FontAwesomeIcons.filter), color: AppColors.currentListOption,
                 style: ButtonStyle(overlayColor: WidgetStateProperty.all(AppColors.invisible))
               )
@@ -169,7 +169,7 @@ class _BabysittersSectionState extends State<BabysittersSection> {
     );
   }
 
-  Future<void> showFilterWindow() async {
+  Future<void> openFiltersWindow() async {
     final Map<String, dynamic>? newFilters = await showDialog(
       context: context,
       builder: (context) {
