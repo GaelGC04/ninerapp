@@ -13,6 +13,7 @@ import 'package:ninerapp/domain/entities/child.dart';
 import 'package:ninerapp/domain/entities/parent.dart';
 import 'package:ninerapp/domain/entities/person.dart';
 import 'package:ninerapp/domain/entities/service.dart';
+import 'package:ninerapp/domain/entities/service_status.dart';
 import 'package:ninerapp/domain/repositories/iservice_repository.dart';
 import 'package:ninerapp/presentation/subscreens/chat.dart';
 import 'package:ninerapp/presentation/subscreens/child_info.dart';
@@ -277,14 +278,18 @@ class _ServiceInfoScreenState extends State<ServiceInfoScreen> {
                       ),
                     ),
                     const SizedBox(height: 45),
-                    if ((widget.person is Parent == true && serviceUpdated.ratedByParent == false)
-                    || (widget.person is Babysitter == true && serviceUpdated.ratedByBabysitter == false)) ...[
-                      showRateSection(),
-                    ] else if ((widget.person is Parent == true && serviceUpdated.ratedByParent == true)
-                    || (widget.person is Babysitter == true && serviceUpdated.ratedByBabysitter == true)) ...[
-                      showRatedDoneMessage(),
+                    if (widget.service.status == ServiceStatus.canceled.value
+                    || widget.service.status == ServiceStatus.completed.value
+                    || widget.service.status == ServiceStatus.rejected.value) ...[
+                      if ((widget.person is Parent == true && serviceUpdated.ratedByParent == false)
+                      || (widget.person is Babysitter == true && serviceUpdated.ratedByBabysitter == false)) ...[
+                        showRateSection(),
+                      ] else if ((widget.person is Parent == true && serviceUpdated.ratedByParent == true)
+                      || (widget.person is Babysitter == true && serviceUpdated.ratedByBabysitter == true)) ...[
+                        showRatedDoneMessage(),
+                      ],
+                      const SizedBox(height: 25),
                     ],
-                    const SizedBox(height: 25),
                     if ((widget.person is Parent == true && serviceUpdated.reportedByParent == false)
                     || (widget.person is Babysitter == true && serviceUpdated.reportedByBabysitter == false)) ...[
                       showReportSection(),
