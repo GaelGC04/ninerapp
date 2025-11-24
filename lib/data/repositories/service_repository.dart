@@ -202,7 +202,7 @@ class ServiceRepository implements IServiceRepository {
   }
 
   @override
-  Future<List<Service>> getServicesByBabysitterId(int id, bool isFinished) async {
+  Future<List<Service>> getServicesByBabysitterId(int id, bool isFinished, bool paymentMethodIsCard, bool paymentMethodIsCash, DateTime? initialDate, DateTime? finalDate, String? statusService) async {
     try {
       final response = await _supabase
         .from('service')
@@ -241,7 +241,7 @@ class ServiceRepository implements IServiceRepository {
   }
 
   @override
-  Future<List<Service>> getServicesByParentId(int id, bool isFinished) async {
+  Future<List<Service>> getServicesByParentId(int id, bool isFinished, bool paymentMethodIsCard, bool paymentMethodIsCash, DateTime? initialDate, DateTime? finalDate, String? statusService) async {
     try {
       final response = await _supabase
         .from('service')

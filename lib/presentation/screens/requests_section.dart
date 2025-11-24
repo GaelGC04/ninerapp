@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ninerapp/core/constants/app_colors.dart';
 import 'package:ninerapp/core/constants/app_textstyles.dart';
 import 'package:ninerapp/dependency_inyection.dart';
+import 'package:ninerapp/domain/entities/babysitter.dart';
 import 'package:ninerapp/domain/entities/parent.dart';
 import 'package:ninerapp/domain/entities/person.dart';
 import 'package:ninerapp/domain/entities/service.dart';
@@ -32,6 +33,12 @@ class _RequestsSectionState extends State<RequestsSection> {
   String? _errorMessage;
   late bool _showingFinishedServices;
 
+  bool paymentMethodIsCard = false;
+  bool paymentMethodIsCash = false;
+  DateTime? initialDate;
+  DateTime? finalDate;
+  String? statusService;
+
   @override
   void initState() {
     _showingFinishedServices = widget.showingFinishedServices;
@@ -49,9 +56,9 @@ class _RequestsSectionState extends State<RequestsSection> {
     try {
       final List<Service> servicesRes;
       if (widget.person is Parent) {
-        servicesRes = await _serviceRepository.getServicesByParentId(widget.person.id!, areFinished);
+        servicesRes = await _serviceRepository.getServicesByParentId(widget.person.id!, areFinished, paymentMethodIsCard, paymentMethodIsCash, initialDate, finalDate, statusService);
       } else {
-        servicesRes = await _serviceRepository.getServicesByBabysitterId(widget.person.id!, areFinished);
+        servicesRes = await _serviceRepository.getServicesByBabysitterId(widget.person.id!, areFinished, paymentMethodIsCard, paymentMethodIsCash, initialDate, finalDate, statusService);
       }
       setState(() {
         servicesList = servicesRes;
@@ -94,7 +101,9 @@ class _RequestsSectionState extends State<RequestsSection> {
               ),
             ),
           ] else ... [
-            buttonsBar(),
+            if (widget.person is Babysitter) ...[
+              buttonsBar(),
+            ],
             Expanded(
               child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
@@ -161,18 +170,26 @@ class _RequestsSectionState extends State<RequestsSection> {
       context: context,
       builder: (context) {
         return FilterWindowRequests(
-          paymentMethodIsCard: false,
-          paymentMethodIsCash: false,
-          initialDate: DateTime.now().subtract(Duration(days: 365 * 5)),
-          finalDate: DateTime.now(),
-          statusService: null,
+          paymentMethodIsCard: paymentMethodIsCard,
+          paymentMethodIsCash: paymentMethodIsCash,
+          initialDate: initialDate,
+          finalDate: finalDate,
+          statusService: statusService,
+          statusToFilterAreFinished: _showingFinishedServices == true,
         );
       },
     );
 
     if (newFilters != null) {
       setState(() {
+        paymentMethodIsCard = newFilters['paymentMethodIsCard'];
+        paymentMethodIsCash = newFilters['paymentMethodIsCash'];
+        initialDate = newFilters['initialDate'];
+        finalDate = newFilters['finalDate'];
+        statusService = newFilters['statusService'];
       });
+
+      print("RESULTADOS:{\n  paymentMethodIsCard: $paymentMethodIsCard,\n  paymentMethodIsCash: $paymentMethodIsCash,\n  initialDate: $initialDate,\n  finalDate: $finalDate,\n  statusService: $statusService\n}");
 
       _loadServices(_showingFinishedServices);
     }

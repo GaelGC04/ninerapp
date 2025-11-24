@@ -26,7 +26,6 @@ class ChildFormScreen extends StatefulWidget {
 }
 
 class _ChildFormScreenState extends State<ChildFormScreen> {
-  // HACER luego poner para que se pueda usar para editar y obtener datos de parametros
   final IChildRepository _childRepository = getIt<IChildRepository>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
