@@ -103,187 +103,254 @@ class _ServiceInfoScreenState extends State<ServiceInfoScreen> {
         backgroundColor: AppColors.primary,
         title: const Text("Datos de solicitud", style: AppTextstyles.appBarText),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              if (_isLoading == true) ...[
-                SizedBox(
-                  height: MediaQuery.of(context).size.height,
-                  child: Center(child: CircularProgressIndicator(color: AppColors.primary))
-                )
-              ] else if (_errorMessage != null) ...[
-                SizedBox(
-                  height: MediaQuery.of(context).size.height,
-                  child: Center(child: Text(_errorMessage!, style: AppTextstyles.appBarText.copyWith(color: AppColors.red), textAlign: TextAlign.center))
-                )
-              ] else ...[
-                const SizedBox(height: 20),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                if (widget.person is Parent) ...[
-                                  Text("${widget.babysitter.isFemale == true ? 'Niñera' : 'Niñero'}:", textAlign: TextAlign.start, style: AppTextstyles.bodyText),
-                                  Text(" - ${widget.babysitter.name} ${widget.babysitter.lastName}", textAlign: TextAlign.start, style: AppTextstyles.bodyText, maxLines: 1, overflow: TextOverflow.ellipsis),
-                                ] else if (widget.person is Babysitter) ...[
-                                  Text("${widget.parent.isFemale == true ? 'Madre' : 'Padre'}:", textAlign: TextAlign.start, style: AppTextstyles.bodyText),
-                                  Text(" - ${widget.parent.name} ${widget.parent.lastName}", textAlign: TextAlign.start, style: AppTextstyles.bodyText, maxLines: 1, overflow: TextOverflow.ellipsis),
-                                ],
+      body: showServiceInfo(context),
+    );
+  }
+
+  Padding showServiceInfo(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            if (_isLoading == true) ...[
+              SizedBox(
+                height: MediaQuery.of(context).size.height,
+                child: Center(child: CircularProgressIndicator(color: AppColors.primary))
+              )
+            ] else if (_errorMessage != null) ...[
+              SizedBox(
+                height: MediaQuery.of(context).size.height,
+                child: Center(child: Text(_errorMessage!, style: AppTextstyles.appBarText.copyWith(color: AppColors.red), textAlign: TextAlign.center))
+              )
+            ] else ...[
+              const SizedBox(height: 20),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (widget.person is Parent) ...[
+                                Text("${widget.babysitter.isFemale == true ? 'Niñera' : 'Niñero'}:", textAlign: TextAlign.start, style: AppTextstyles.bodyText),
+                                Text(" - ${widget.babysitter.name} ${widget.babysitter.lastName}", textAlign: TextAlign.start, style: AppTextstyles.bodyText, maxLines: 1, overflow: TextOverflow.ellipsis),
+                              ] else if (widget.person is Babysitter) ...[
+                                Text("${widget.parent.isFemale == true ? 'Madre' : 'Padre'}:", textAlign: TextAlign.start, style: AppTextstyles.bodyText),
+                                Text(" - ${widget.parent.name} ${widget.parent.lastName}", textAlign: TextAlign.start, style: AppTextstyles.bodyText, maxLines: 1, overflow: TextOverflow.ellipsis),
                               ],
-                            ),
+                            ],
                           ),
-                          Tooltip(
-                            message: "Abrir chat",
-                            child: IconButton(
-                              onPressed: showServiceChat,
-                              icon: Icon(FontAwesomeIcons.solidEnvelope), color: AppColors.currentListOption,
-                              style: ButtonStyle(overlayColor: WidgetStateProperty.all(AppColors.invisible))
-                            ),
+                        ),
+                        Tooltip(
+                          message: "Abrir chat",
+                          child: IconButton(
+                            onPressed: showServiceChat,
+                            icon: Icon(FontAwesomeIcons.solidEnvelope), color: AppColors.currentListOption,
+                            style: ButtonStyle(overlayColor: WidgetStateProperty.all(AppColors.invisible))
                           ),
-                        ]
-                      ),
-                      const SizedBox(height: 15),
-                      SizedBox(
-                        width: double.infinity,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Estado del servicio:", textAlign: TextAlign.start, style: AppTextstyles.bodyText),
-                            Text(" - ${serviceUpdated.status}", textAlign: TextAlign.start, style: AppTextstyles.bodyText, maxLines: 1, overflow: TextOverflow.ellipsis),
-                          ],
                         ),
-                      ),
-                      const SizedBox(height: 15),
-                      SizedBox(
-                        width: double.infinity,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Fecha:", textAlign: TextAlign.start, style: AppTextstyles.bodyText),
-                            Text(" - ${TimeNumberFormat.parseDate(serviceUpdated.date, true, true)}", textAlign: TextAlign.start, style: AppTextstyles.bodyText, maxLines: 1, overflow: TextOverflow.ellipsis),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 15),
-                      SizedBox(
-                        width: double.infinity,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Horas: ${serviceUpdated.hours}", textAlign: TextAlign.start, style: AppTextstyles.bodyText),
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        width: double.infinity,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Minutos: ${serviceUpdated.minutes}", textAlign: TextAlign.start, style: AppTextstyles.bodyText),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 15),
-                      SizedBox(
-                        width: double.infinity,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Instrucciones adicionales:", textAlign: TextAlign.start, style: AppTextstyles.bodyText),
-                            Text(serviceUpdated.instructions ?? "Sin instrucciones", textAlign: TextAlign.start, style: AppTextstyles.bodyText),
-                          ],
-                        ),
-                      ),
-                      _multipleInfoSection(
-                        "Niños a cuidar:",
-                        [
-                          ...serviceUpdated.children.map((child) {
-                            return (child);
-                          }),
+                      ]
+                    ),
+                    const SizedBox(height: 15),
+                    SizedBox(
+                      width: double.infinity,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Estado del servicio:", textAlign: TextAlign.start, style: AppTextstyles.bodyText),
+                          Text(" - ${serviceUpdated.status}", textAlign: TextAlign.start, style: AppTextstyles.bodyText, maxLines: 1, overflow: TextOverflow.ellipsis),
                         ],
                       ),
-                      const SizedBox(height: 15),
-                      SizedBox(
-                        width: double.infinity,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text("Costo total del servicio: \$${widget.service.totalPrice.toStringAsFixed(2)} mxn por 2 horas", textAlign: TextAlign.center, style: AppTextstyles.indexSubtitle.copyWith(color: AppColors.currentSectionColor)),
-                            if (widget.service.paymentWithCard == true) ...[
-                              Text("Pagado con tarjeta", textAlign: TextAlign.center, style: AppTextstyles.indexSubtitle.copyWith(color: AppColors.currentSectionColor)),
-                            ] else ...[
-                              Text("Pagar en efectivo al recoger a los niños", textAlign: TextAlign.center, style: AppTextstyles.indexSubtitle.copyWith(color: AppColors.currentSectionColor)),
-                            ],
+                    ),
+                    const SizedBox(height: 15),
+                    SizedBox(
+                      width: double.infinity,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Fecha:", textAlign: TextAlign.start, style: AppTextstyles.bodyText),
+                          Text(" - ${TimeNumberFormat.parseDate(serviceUpdated.date, true, true)}", textAlign: TextAlign.start, style: AppTextstyles.bodyText, maxLines: 1, overflow: TextOverflow.ellipsis),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    SizedBox(
+                      width: double.infinity,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Horas: ${serviceUpdated.hours}", textAlign: TextAlign.start, style: AppTextstyles.bodyText),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      width: double.infinity,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Minutos: ${serviceUpdated.minutes}", textAlign: TextAlign.start, style: AppTextstyles.bodyText),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    SizedBox(
+                      width: double.infinity,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Instrucciones adicionales:", textAlign: TextAlign.start, style: AppTextstyles.bodyText),
+                          Text(serviceUpdated.instructions ?? "Sin instrucciones", textAlign: TextAlign.start, style: AppTextstyles.bodyText),
+                        ],
+                      ),
+                    ),
+                    _multipleInfoSection(
+                      "Niños a cuidar:",
+                      [
+                        ...serviceUpdated.children.map((child) {
+                          return (child);
+                        }),
+                      ],
+                    ),
+                    const SizedBox(height: 15),
+                    SizedBox(
+                      width: double.infinity,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text("Costo total del servicio: \$${widget.service.totalPrice.toStringAsFixed(2)} mxn por 2 horas", textAlign: TextAlign.center, style: AppTextstyles.indexSubtitle.copyWith(color: AppColors.currentSectionColor)),
+                          if (widget.service.paymentWithCard == true) ...[
+                            Text("Pagado con tarjeta", textAlign: TextAlign.center, style: AppTextstyles.indexSubtitle.copyWith(color: AppColors.currentSectionColor)),
+                          ] else ...[
+                            Text("Pagar en efectivo al recoger a los niños", textAlign: TextAlign.center, style: AppTextstyles.indexSubtitle.copyWith(color: AppColors.currentSectionColor)),
                           ],
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    SizedBox(
+                      width: double.infinity,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Ubicación del servicio:", textAlign: TextAlign.start, style: AppTextstyles.bodyText),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      height: 350,
+                      width: double.infinity,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(15),
+                        child: GoogleMap(
+                          initialCameraPosition: CameraPosition(target: _currentLocation, zoom: 17),
+                          markers: _markers,
+                          onMapCreated: (GoogleMapController controller) {
+                            _mapController = controller;
+                            _getLocation();
+                          },
+                          gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+                            Factory<OneSequenceGestureRecognizer>(() => EagerGestureRecognizer()),
+                            Factory<PanGestureRecognizer>(() => PanGestureRecognizer()),
+                            Factory<ScaleGestureRecognizer>(() => ScaleGestureRecognizer()),
+                          },
                         ),
                       ),
-                      const SizedBox(height: 15),
-                      SizedBox(
-                        width: double.infinity,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Ubicación del servicio:", textAlign: TextAlign.start, style: AppTextstyles.bodyText),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        height: 350,
-                        width: double.infinity,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(15),
-                          child: GoogleMap(
-                            initialCameraPosition: CameraPosition(target: _currentLocation, zoom: 17),
-                            markers: _markers,
-                            onMapCreated: (GoogleMapController controller) {
-                              _mapController = controller;
-                              _getLocation();
-                            },
-                            gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
-                              Factory<OneSequenceGestureRecognizer>(() => EagerGestureRecognizer()),
-                              Factory<PanGestureRecognizer>(() => PanGestureRecognizer()),
-                              Factory<ScaleGestureRecognizer>(() => ScaleGestureRecognizer()),
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 45),
+                    showRateSection(),
+                    const SizedBox(height: 25),
+                    showReportSection(),
+                  ],
+                ),
+              ),
+            ],
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                AppButton(
+                  onPressed: () => Navigator.pop(context),
+                  backgroundColor: AppColors.currentSectionColor,
+                  textColor: AppColors.white,
+                  text: "Volver",
+                  icon: null,
+                  coloredBorder: true
                 ),
               ],
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  AppButton(
-                    onPressed: () => Navigator.pop(context),
-                    backgroundColor: AppColors.currentSectionColor,
-                    textColor: AppColors.white,
-                    text: "Volver",
-                    icon: null,
-                    coloredBorder: true
-                  ),
-                ],
-              ),
-              const SizedBox(height: 40),
-            ],
-          ),
+            ),
+            const SizedBox(height: 40),
+          ],
         ),
       ),
+    );
+  }
+
+  Container showRateSection() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 15),
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(
+          color: AppColors.green,
+          width: 2,
+        ),
+        color: AppColors.lightGreen,
+      ),
+      child: Column(
+        children: [
+          const SizedBox(height: 20),
+          Text("Calificar a ${widget.babysitter.name} ${widget.babysitter.lastName}", style: TextStyle(color: AppColors.green), textAlign: TextAlign.center),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              for (int starsIterator = 0; starsIterator < 5; starsIterator++) ...[
+                Tooltip(
+                  message: "${starsIterator + 1} Estrellas",
+                  child: IconButton(
+                    onPressed: (){
+                      rateUser(starsIterator + 1);
+                    },
+                    icon: Icon(FontAwesomeIcons.solidStar),
+                    color: AppColors.green,
+                    hoverColor: AppColors.invisible,
+                    splashColor: AppColors.invisible,
+                    highlightColor: AppColors.invisible
+                  ),
+                ),
+              ]
+            ]
+          ),
+          const SizedBox(height: 10),
+        ]
+      )
+    );
+  }
+
+  void rateUser(int starsAmount) {
+    // hay q hacer la funcionalidad de esta funcion
+    // q se llame a la base de datos y se le sume al niñero las estrellas dadas, print("Estrella ${stars} presionada");
+  }
+
+  AppButton showReportSection() {
+    return AppButton(
+      onPressed: (){},
+      backgroundColor: AppColors.red,
+      textColor: AppColors.lightRed,
+      text: (widget.person is Parent == true) ? "Reportar a ${widget.babysitter.name} ${widget.babysitter.lastName}" : "Reportar a ${widget.parent.name} ${widget.parent.lastName}",
+      icon: null,
+      coloredBorder: true
     );
   }
 

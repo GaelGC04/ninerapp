@@ -50,7 +50,15 @@ class _AppButtonState extends State<AppButton> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(widget.text, style: TextStyle(color: widget.coloredBorder ? backgroundColor : widget.textColor)),
+            Flexible(
+              child: Text(
+                widget.text,
+                style: TextStyle(color: widget.coloredBorder ? backgroundColor : widget.textColor),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,softWrap: true,
+                textAlign: TextAlign.center
+              ),
+            ),
             if (widget.icon != null) ...[
               const SizedBox(width: 15),
               Icon(widget.icon, size: 16, color: widget.coloredBorder ? backgroundColor : widget.textColor),

@@ -1,10 +1,10 @@
 
 enum ServiceStatus {
   waiting('Esperando respuesta'),
-  canceled('Cancelado'),
-  rejected('Rechazado'),
   accepted('Aceptado'),
   process('En proceso'),
+  canceled('Cancelado'),
+  rejected('Rechazado'),
   completed('Completado');
 
   final String value;
