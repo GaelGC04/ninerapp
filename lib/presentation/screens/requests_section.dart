@@ -8,6 +8,7 @@ import 'package:ninerapp/domain/entities/person.dart';
 import 'package:ninerapp/domain/entities/service.dart';
 import 'package:ninerapp/domain/repositories/iservice_repository.dart';
 import 'package:ninerapp/presentation/widgets/app_button.dart';
+import 'package:ninerapp/presentation/widgets/filter_modal_requests.dart';
 import 'package:ninerapp/presentation/widgets/service_card.dart';
 
 class RequestsSection extends StatefulWidget {
@@ -93,6 +94,7 @@ class _RequestsSectionState extends State<RequestsSection> {
               ),
             ),
           ] else ... [
+            buttonsBar(),
             Expanded(
               child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
@@ -125,6 +127,55 @@ class _RequestsSectionState extends State<RequestsSection> {
         ]
       )
     );
+  }
+
+  Widget buttonsBar() {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.blueTransparent,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Spacer(),
+          Container(
+            height: 40, width: 40,
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: IconButton(
+              onPressed: openFiltersWindow,
+              icon: Icon(FontAwesomeIcons.filter), color: AppColors.currentListOption,
+              style: ButtonStyle(overlayColor: WidgetStateProperty.all(AppColors.invisible))
+            )
+          ),
+        ]
+      ),
+    );
+  }
+
+  Future<void> openFiltersWindow() async {
+    final Map<String, dynamic>? newFilters = await showDialog(
+      context: context,
+      builder: (context) {
+        return FilterWindowRequests(
+          paymentMethodIsCard: false,
+          paymentMethodIsCash: false,
+          initialDate: DateTime.now().subtract(Duration(days: 365 * 5)),
+          finalDate: DateTime.now(),
+          statusService: null,
+        );
+      },
+    );
+
+    if (newFilters != null) {
+      setState(() {
+      });
+
+      _loadServices(_showingFinishedServices);
+    }
   }
 
   ServiceCard showServiceCard(Service service) {
