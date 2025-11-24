@@ -342,7 +342,11 @@ class _ServiceInfoScreenState extends State<ServiceInfoScreen> {
       child: Column(
         children: [
           const SizedBox(height: 20),
-          Text("Calificar a ${widget.babysitter.name} ${widget.babysitter.lastName}", style: TextStyle(color: AppColors.green), textAlign: TextAlign.center),
+          if (widget.person is Parent) ...[
+            Text("Calificar a ${widget.babysitter.name} ${widget.babysitter.lastName}", style: TextStyle(color: AppColors.green), textAlign: TextAlign.center),
+          ] else  ...[
+            Text("Calificar a ${widget.parent.name} ${widget.parent.lastName}", style: TextStyle(color: AppColors.green), textAlign: TextAlign.center),
+          ],
           const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
