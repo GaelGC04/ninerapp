@@ -5,6 +5,7 @@ class Parent extends Person {
   final String email;
   final int rating;
   final int amountRatings;
+  final int amountReports;
 
   Parent({
     super.id,
@@ -19,6 +20,7 @@ class Parent extends Person {
     required super.lastLongitude,
     required this.rating,
     required this.amountRatings,
+    required this.amountReports,
   });
 
   static Parent fromMap(Map<String, dynamic> map) {
@@ -35,6 +37,7 @@ class Parent extends Person {
       lastLongitude: null,
       rating: (map['rating'] as num).toInt(),
       amountRatings: (map['amount_ratings'] as num).toInt(),
+      amountReports: (map['amount_reports'] as num).toInt(),
     );
   }
 
@@ -50,6 +53,7 @@ class Parent extends Person {
       'email': email,
       'rating': rating,
       'amount_ratings': amountRatings,
+      'amount_reports': amountReports,
     });
   }
 }

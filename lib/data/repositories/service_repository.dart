@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:ninerapp/domain/entities/babysitter.dart';
 import 'package:ninerapp/domain/entities/child.dart';
 import 'package:ninerapp/domain/entities/parent.dart';
@@ -11,6 +12,98 @@ class ServiceRepository implements IServiceRepository {
   final SupabaseClient _supabase;
 
   ServiceRepository({required SupabaseClient supabase}) : _supabase = supabase;
+
+  @override
+  Future<bool> updateUserRate(Service service, bool isRatedByParent, int starsAmount) async {
+    try {
+      if (isRatedByParent == true) {
+        Map<String, dynamic> jsonBabysitter = service.babysitter.toMap();
+        jsonBabysitter['rating'] += starsAmount;
+        jsonBabysitter['amount_ratings'] += 1;
+
+        await _supabase
+          .from('babysitter')
+          .update({
+            'rating': jsonBabysitter['rating'],
+            'amount_ratings': jsonBabysitter['amount_ratings'],
+          }).eq('id', service.babysitter.id!).then((_) async {
+            await _supabase
+              .from('service')
+              .update({
+                'rated_by_parent': true,
+              }).eq('id', service.id!);
+          });
+      } else {
+        Map<String, dynamic> jsonParent = service.parent.toMap();
+        jsonParent['rating'] += starsAmount;
+        jsonParent['amount_ratings'] += 1;
+
+        await _supabase
+          .from('parent')
+          .update({
+            'rating': jsonParent['rating'],
+            'amount_ratings': jsonParent['amount_ratings'],
+          }).eq('id', service.parent.id!).then((_) async {
+            await _supabase
+              .from('service')
+              .update({
+                'rated_by_babysitter': true,
+              }).eq('id', service.id!);
+          });
+      }
+      return true;
+    } on PostgrestException catch (e) {
+      debugPrint('Error al calificar al usuario: ${e.message}');
+      return false;
+    } catch (e) {
+      debugPrint('Error inesperado al calificar al usuario: $e');
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> updateUserReports(Service service, bool isReportedByParent) async {
+    try {
+      if (isReportedByParent == true) {
+        Map<String, dynamic> jsonBabysitter = service.babysitter.toMap();
+        jsonBabysitter['amount_reports'] += 1;
+
+        await _supabase
+          .from('babysitter')
+          .update({
+            'amount_reports': jsonBabysitter['amount_reports'],
+          }).eq('id', service.babysitter.id!).then((_) async {
+            await _supabase
+              .from('service')
+              .update({
+                'reported_by_parent': true,
+              }).eq('id', service.id!);
+          });
+      } else {
+        Map<String, dynamic> jsonParent = service.parent.toMap();
+        jsonParent['amount_reports'] += 1;
+
+        await _supabase
+          .from('parent')
+          .update({
+            'amount_reports': jsonParent['amount_reports'],
+          }).eq('id', service.parent.id!).then((_) async {
+            await _supabase
+              .from('service')
+              .update({
+                'reported_by_babysitter': true,
+              }).eq('id', service.id!);
+          });
+      }
+      return true;
+    } on PostgrestException catch (e) {
+      debugPrint('Error al reportar al usuario: ${e.message}');
+      return false;
+    } catch (e) {
+      debugPrint('Error inesperado al reportar al usuario: $e');
+      return false;
+    }
+  }
 
   @override
   Future<void> addService(Service service) async {

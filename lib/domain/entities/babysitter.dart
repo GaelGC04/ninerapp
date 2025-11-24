@@ -11,6 +11,7 @@ class Babysitter extends Person {
   final String? expOtherDisabilities;
   final int rating;
   final int amountRatings;
+  final int amountReports;
 
   final String? profileImageUrl;
 
@@ -38,6 +39,7 @@ class Babysitter extends Person {
     this.distanceMeters,
     this.profileImageUrl,
     this.isFavorite = false,
+    required this.amountReports,
   });
 
   static Babysitter fromMap(Map<String, dynamic> map) {
@@ -64,26 +66,28 @@ class Babysitter extends Person {
       amountRatings: (map['amount_ratings'] as num).toInt(),
 
       profileImageUrl: map['profile_image_url'] as String?,
+      amountReports: (map['amount_reports'] as num).toInt(),
     );
   }
 
   @override
   Map<String, dynamic> toMap() {
     return super.toMap()..addAll({
-        'password': password,
-        'email': email,
-        'price_per_hour': pricePerHour,
-        'exp_physical_disability': expPhysicalDisability,
-        'exp_hearing_disability': expHearingDisability,
-        'exp_visual_disability': expVisualDisability,
-        'exp_other_disabilities': expOtherDisabilities,
-        'last_latitude': lastLatitude,
-        'last_longitude': lastLongitude,
-        'rating': rating,
-        'amount_ratings': amountRatings,
-        'work_start_year': workStartYear,
-        'profile_image_url': profileImageUrl,
-      });
+      'password': password,
+      'email': email,
+      'price_per_hour': pricePerHour,
+      'exp_physical_disability': expPhysicalDisability,
+      'exp_hearing_disability': expHearingDisability,
+      'exp_visual_disability': expVisualDisability,
+      'exp_other_disabilities': expOtherDisabilities,
+      'last_latitude': lastLatitude,
+      'last_longitude': lastLongitude,
+      'rating': rating,
+      'amount_ratings': amountRatings,
+      'work_start_year': workStartYear,
+      'profile_image_url': profileImageUrl,
+      'amount_reports': amountReports,
+    });
   }
 
   double getAverageStars() {

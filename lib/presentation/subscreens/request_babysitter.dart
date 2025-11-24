@@ -414,6 +414,8 @@ class _RequestBabysitterScreenState extends State<RequestBabysitterScreen> {
       ratedByParent: false,
       deletedByBabysitter: false,
       deletedByParent: false,
+      reportedByBabysitter: false,
+      reportedByParent: false,
     );
     for (var child in childrenList.keys) {
       if (childrenList[child] == true) {

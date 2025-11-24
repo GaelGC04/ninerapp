@@ -357,6 +357,7 @@ class _EditUserScreenState extends State<EditUserScreen> {
           lastLongitude: null,
           rating: 0,
           amountRatings: 0,
+          amountReports: 0,
         );
       } else if (widget.person is Babysitter) {
         int currentYear = DateTime.now().year;
@@ -380,6 +381,7 @@ class _EditUserScreenState extends State<EditUserScreen> {
           rating: _babysitter!.rating,
           amountRatings: _babysitter!.amountRatings,
           profileImageUrl: _profileImageUrlController.text.trim().isEmpty ? null : _profileImageUrlController.text.trim(),
+          amountReports: _babysitter!.amountReports,
         );
       }
       if (widget.person is Parent) {

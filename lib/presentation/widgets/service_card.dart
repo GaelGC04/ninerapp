@@ -54,7 +54,7 @@ class _ServiceCardState extends State<ServiceCard> {
   void showServiceInfo() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => ServiceInfoScreen(service: widget.service, parent: widget.service.parent, babysitter: widget.service.babysitter, person: widget.person),
+        builder: (context) => ServiceInfoScreen(service: widget.service, parent: widget.service.parent, babysitter: widget.service.babysitter, person: widget.person, onWindowExit: widget.onStatusChange),
       ),
     );
   }

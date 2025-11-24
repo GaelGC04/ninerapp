@@ -371,6 +371,7 @@ class _RegisterState extends State<Register> {
         lastLongitude: null,
         rating: 0,
         amountRatings: 0,
+        amountReports: 0,
       );
     } else if (_isParent == false) {
       int currentYear = DateTime.now().year;
@@ -392,6 +393,7 @@ class _RegisterState extends State<Register> {
         lastLongitude: null,
         rating: 0,
         amountRatings: 0,
+        amountReports: 0,
       );
     }
     if (_isParent == true) {

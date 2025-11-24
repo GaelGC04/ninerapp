@@ -9,4 +9,6 @@ abstract class IServiceRepository {
   Future<void> addService(Service service);
   Future<void> updateServiceStatus(int id, String status);
   Future<void> deleteService(int id, Person person);
+  Future<bool> updateUserRate(Service service, bool isRatedByParent, int starsAmount);
+  Future<bool> updateUserReports(Service service, bool isReportedByParent);
 }

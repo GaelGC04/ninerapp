@@ -18,8 +18,10 @@ class Service {
   final String? instructions;
   final bool deletedByParent;
   final bool deletedByBabysitter;
-  final bool ratedByParent;
-  final bool ratedByBabysitter;
+  bool ratedByParent;
+  bool ratedByBabysitter;
+  bool reportedByParent;
+  bool reportedByBabysitter;
 
   Service({
     this.id,
@@ -39,6 +41,8 @@ class Service {
     required this.deletedByBabysitter,
     required this.ratedByParent,
     required this.ratedByBabysitter,
+    required this.reportedByParent,
+    required this.reportedByBabysitter,
   });
 
   static Service fromMap(Map<String, dynamic> map, List<Child> list) {
@@ -59,7 +63,9 @@ class Service {
       ratedByBabysitter: map['rated_by_babysitter'] as bool,
       deletedByParent: map['deleted_by_parent'] as bool,
       deletedByBabysitter: map['deleted_by_babysitter'] as bool,
-      children: list
+      children: list,
+      reportedByParent: map['reported_by_parent'] as bool,
+      reportedByBabysitter: map['reported_by_babysitter'] as bool,
     );
   }
 
@@ -80,6 +86,8 @@ class Service {
       'deleted_by_babysitter': deletedByBabysitter,
       'rated_by_parent': ratedByParent,
       'rated_by_babysitter': ratedByBabysitter,
+      'reported_by_parent': reportedByParent,
+      'reported_by_babysitter': reportedByBabysitter,
     };
   }
 }

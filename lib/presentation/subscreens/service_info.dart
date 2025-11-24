@@ -23,6 +23,7 @@ class ServiceInfoScreen extends StatefulWidget {
   final Service service;
   final Parent parent;
   final Babysitter babysitter;
+  final VoidCallback onWindowExit;
 
   const ServiceInfoScreen({
     super.key,
@@ -30,6 +31,7 @@ class ServiceInfoScreen extends StatefulWidget {
     required this.service,
     required this.parent,
     required this.babysitter,
+    required this.onWindowExit,
   });
 
   @override
@@ -51,7 +53,7 @@ class _ServiceInfoScreenState extends State<ServiceInfoScreen> {
     super.initState();
     loadService();
   }
-
+ 
   void _getLocation() async {
     final LatLng newLocation = LatLng(widget.service.latitude, widget.service.longitude);
 
@@ -97,13 +99,21 @@ class _ServiceInfoScreenState extends State<ServiceInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.white,
-      appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        title: const Text("Datos de solicitud", style: AppTextstyles.appBarText),
+    return PopScope(
+      canPop: false, 
+      
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        onExit();
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.white,
+        appBar: AppBar(
+          backgroundColor: AppColors.primary,
+          title: const Text("Datos de solicitud", style: AppTextstyles.appBarText),
+        ),
+        body: showServiceInfo(context),
       ),
-      body: showServiceInfo(context),
     );
   }
 
@@ -267,9 +277,21 @@ class _ServiceInfoScreenState extends State<ServiceInfoScreen> {
                       ),
                     ),
                     const SizedBox(height: 45),
-                    showRateSection(),
+                    if ((widget.person is Parent == true && serviceUpdated.ratedByParent == false)
+                    || (widget.person is Babysitter == true && serviceUpdated.ratedByBabysitter == false)) ...[
+                      showRateSection(),
+                    ] else if ((widget.person is Parent == true && serviceUpdated.ratedByParent == true)
+                    || (widget.person is Babysitter == true && serviceUpdated.ratedByBabysitter == true)) ...[
+                      showRatedDoneMessage(),
+                    ],
                     const SizedBox(height: 25),
-                    showReportSection(),
+                    if ((widget.person is Parent == true && serviceUpdated.reportedByParent == false)
+                    || (widget.person is Babysitter == true && serviceUpdated.reportedByBabysitter == false)) ...[
+                      showReportSection(),
+                    ] else if ((widget.person is Parent == true && serviceUpdated.reportedByParent == true)
+                    || (widget.person is Babysitter == true && serviceUpdated.reportedByBabysitter == true)) ...[
+                      showReportDoneMessage(),
+                    ],
                   ],
                 ),
               ),
@@ -279,7 +301,7 @@ class _ServiceInfoScreenState extends State<ServiceInfoScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 AppButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () => onExit(),
                   backgroundColor: AppColors.currentSectionColor,
                   textColor: AppColors.white,
                   text: "Volver",
@@ -293,6 +315,11 @@ class _ServiceInfoScreenState extends State<ServiceInfoScreen> {
         ),
       ),
     );
+  }
+
+  void onExit() {
+    widget.onWindowExit();
+    Navigator.of(context).pop();
   }
 
   Container showRateSection() {
@@ -338,19 +365,117 @@ class _ServiceInfoScreenState extends State<ServiceInfoScreen> {
     );
   }
 
-  void rateUser(int starsAmount) {
-    // hay q hacer la funcionalidad de esta funcion
-    // q se llame a la base de datos y se le sume al niñero las estrellas dadas, print("Estrella ${stars} presionada");
+  Container showRatedDoneMessage() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      width: double.infinity,
+      child: Text("Ya has calificado a ${widget.person is Parent == true ? "${widget.babysitter.name} ${widget.babysitter.lastName}" : "${widget.parent.name} ${widget.parent.lastName}"} en este servicio", style: TextStyle(color: AppColors.green), textAlign: TextAlign.center),
+    );
+  }
+
+  void rateUser(int starsAmount) async {
+    bool result = await _serviceRepository.updateUserRate(widget.service, widget.person is Parent == true, starsAmount);
+    if (result == false) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Ha ocurrido un error al enviar la calificación, intentar de nuevo más tarde', style: TextStyle(color: AppColors.white)),
+            backgroundColor: AppColors.red,
+          ),
+        );
+      }
+      return;
+    }
+    setState(() {
+      if (widget.person is Parent) {
+        serviceUpdated.ratedByParent = true;
+      } else if (widget.person is Babysitter) {
+        serviceUpdated.ratedByBabysitter = true;
+      }
+    });
   }
 
   AppButton showReportSection() {
     return AppButton(
-      onPressed: (){},
+      onPressed: () => showConfirmReportWindow(),
       backgroundColor: AppColors.red,
       textColor: AppColors.lightRed,
       text: (widget.person is Parent == true) ? "Reportar a ${widget.babysitter.name} ${widget.babysitter.lastName}" : "Reportar a ${widget.parent.name} ${widget.parent.lastName}",
       icon: null,
       coloredBorder: true
+    );
+  }
+
+  void showConfirmReportWindow() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: null,
+          contentPadding: const EdgeInsets.only(top: 50, bottom: 20, left: 20, right: 20),
+          actionsPadding: const EdgeInsets.only(bottom: 40, top: 20, left: 20, right: 20),
+          content: Text('¿Deseas reportar a ${(widget.person is Parent == true) ? "${widget.babysitter.name} ${widget.babysitter.lastName}" : "${widget.parent.name} ${widget.parent.lastName}"}?', style: AppTextstyles.bodyText.copyWith(color: AppColors.currentSectionColor, fontSize: 22), textAlign: TextAlign.center),
+          actions: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AppButton (
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  backgroundColor: AppColors.currentSectionColor,
+                  textColor: AppColors.white,
+                  text: "No",
+                  icon: null,
+                  coloredBorder: true
+                ),
+                const SizedBox(width: 30),
+                AppButton (
+                  onPressed: () {
+                    reportUser();
+                    Navigator.of(context).pop();
+                  },
+                  backgroundColor: AppColors.currentSectionColor,
+                  textColor: AppColors.white,
+                  text: "Si",
+                  icon: null,
+                  coloredBorder: false
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void reportUser() async {
+    bool result = await _serviceRepository.updateUserReports(widget.service, widget.person is Parent == true);
+    if (result == false) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Ha ocurrido un error al enviar el reporte, intentar de nuevo más tarde', style: TextStyle(color: AppColors.white)),
+            backgroundColor: AppColors.red,
+          ),
+        );
+      }
+      return;
+    }
+    setState(() {
+      if (widget.person is Parent) {
+        serviceUpdated.reportedByParent = true;
+      } else if (widget.person is Babysitter) {
+        serviceUpdated.reportedByBabysitter = true;
+      }
+    });
+  }
+
+  Container showReportDoneMessage() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      width: double.infinity,
+      child: Text("Ya has reportado a ${widget.person is Parent == true ? "${widget.babysitter.name} ${widget.babysitter.lastName}" : "${widget.parent.name} ${widget.parent.lastName}"} en este servicio", style: TextStyle(color: AppColors.red), textAlign: TextAlign.center),
     );
   }
 
