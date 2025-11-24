@@ -18,6 +18,10 @@ class Babysitter extends Person {
   late int? distanceMeters;
   late bool isFavorite;
 
+  late bool isIdentificationSent;
+  late bool isStudySent;
+  late bool isDomicileSent;
+
   Babysitter({
     super.id,
     required this.password,
@@ -40,6 +44,9 @@ class Babysitter extends Person {
     this.profileImageUrl,
     this.isFavorite = false,
     required this.amountReports,
+    this.isIdentificationSent = false,
+    this.isStudySent = false,
+    this.isDomicileSent = false,
   });
 
   static Babysitter fromMap(Map<String, dynamic> map) {
@@ -67,6 +74,10 @@ class Babysitter extends Person {
 
       profileImageUrl: map['profile_image_url'] as String?,
       amountReports: (map['amount_reports'] as num).toInt(),
+
+      isIdentificationSent: map['is_identification_sent'] as bool? ?? false,
+      isStudySent: map['is_study_sent'] as bool? ?? false,
+      isDomicileSent: map['is_domicile_sent'] as bool? ?? false,
     );
   }
 
@@ -87,6 +98,9 @@ class Babysitter extends Person {
       'work_start_year': workStartYear,
       'profile_image_url': profileImageUrl,
       'amount_reports': amountReports,
+      'is_identification_sent': isIdentificationSent,
+      'is_study_sent': isStudySent,
+      'is_domicile_sent': isDomicileSent,
     });
   }
 

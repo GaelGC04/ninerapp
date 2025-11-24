@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:ninerapp/core/util/location_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -8,6 +9,45 @@ class BabysitterRepository implements IBabysitterRepository {
   final SupabaseClient _supabase;
 
   BabysitterRepository({required SupabaseClient supabase}) : _supabase = supabase;
+
+  @override
+  Future<bool> updateBabysitterDocuments(Babysitter babysitter, String documentType) async {
+    try {
+      Map<String, dynamic> jsonBabysitter = babysitter.toMap();
+      if (documentType == "identification") {
+        jsonBabysitter['is_identification_sent'] = true;
+        await _supabase
+        .from('babysitter')
+        .update({
+          'is_identification_sent': jsonBabysitter['is_identification_sent'],
+        }).eq('id', babysitter.id!);
+
+      } else if (documentType == "study") {
+        jsonBabysitter['is_study_sent'] = true;
+        await _supabase
+        .from('babysitter')
+        .update({
+          'is_study_sent': jsonBabysitter['is_study_sent'],
+        }).eq('id', babysitter.id!);
+
+      } else if (documentType == "domicile") {
+        jsonBabysitter['is_domicile_sent'] = true;
+        await _supabase
+        .from('babysitter')
+        .update({
+          'is_domicile_sent': jsonBabysitter['is_domicile_sent'],
+        }).eq('id', babysitter.id!);
+      }
+      
+      return true;
+    } on PostgrestException catch (e) {
+      debugPrint('Error al subir documento: ${e.message}');
+      return false;
+    } catch (e) {
+      debugPrint('Error inesperado al calificar al subir documento: $e');
+      return false;
+    }
+  }
 
   @override
   Future<List<Babysitter>> getFavoriteBabysitters(double? lastLatitude, double? lastLongitude, int parentId) async {
@@ -21,7 +61,6 @@ class BabysitterRepository implements IBabysitterRepository {
         .map((map) => map['babysitter_id'] as int)
         .toList();
       
-      // Si no hay favoritos, devolvemos una lista vacía para evitar errores en la consulta IN
       if (favoriteBabysitterIds.isEmpty) {
         return [];
       }
@@ -29,7 +68,7 @@ class BabysitterRepository implements IBabysitterRepository {
       final babysittersResponse = await _supabase
         .from('babysitter')
         .select('*')
-        .filter('id', 'in', favoriteBabysitterIds); // Filtra por la lista de IDs de favoritos
+        .filter('id', 'in', favoriteBabysitterIds);
 
       List<Babysitter> favoriteBabysitters = (babysittersResponse as List)
         .map((babysitterMap) => Babysitter.fromMap(babysitterMap))

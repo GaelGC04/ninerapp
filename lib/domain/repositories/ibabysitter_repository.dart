@@ -11,4 +11,5 @@ abstract class IBabysitterRepository {
   Future<void> editBabysitterFavorite(int babysitterId, int parentId, bool isFavorite);
   Future<void> updateBabysitter(Babysitter babysitter);
   Future<void> deleteBabysitter(int id);
+  Future<bool> updateBabysitterDocuments(Babysitter babysitter, String documentType);
 }

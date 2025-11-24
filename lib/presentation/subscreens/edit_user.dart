@@ -382,6 +382,9 @@ class _EditUserScreenState extends State<EditUserScreen> {
           amountRatings: _babysitter!.amountRatings,
           profileImageUrl: _profileImageUrlController.text.trim().isEmpty ? null : _profileImageUrlController.text.trim(),
           amountReports: _babysitter!.amountReports,
+          isIdentificationSent: _babysitter!.isIdentificationSent,
+          isStudySent: _babysitter!.isStudySent,
+          isDomicileSent: _babysitter!.isDomicileSent,
         );
       }
       if (widget.person is Parent) {

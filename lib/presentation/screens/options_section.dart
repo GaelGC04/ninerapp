@@ -108,19 +108,25 @@ class _OptionsSectionState extends State<OptionsSection> {
               childrenListContent(),
             ],
             if (widget.person is Babysitter == true) ...[
-              const SizedBox(height: 20),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: AppButton(
-                  onPressed: () => showValidateDocumentsScreen(),
-                  backgroundColor: AppColors.lightGrey,
-                  textColor: AppColors.fontColor,
-                  text: "Subir documentos",
-                  icon: null,
-                  coloredBorder: false
+              const SizedBox(height: 30),
+              if ((widget.person as Babysitter).isIdentificationSent == true
+              && (widget.person as Babysitter).isStudySent == true
+              && (widget.person as Babysitter).isDomicileSent == true) ...[
+                showUploadedDocuments(),
+              ] else ...[
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: AppButton(
+                    onPressed: () => showValidateDocumentsScreen(),
+                    backgroundColor: AppColors.lightGrey,
+                    textColor: AppColors.fontColor,
+                    text: "Subir documentos",
+                    icon: null,
+                    coloredBorder: false
+                  ),
                 ),
-              ),
+              ],
             ],
 
             const SizedBox(height: 80),
@@ -157,10 +163,24 @@ class _OptionsSectionState extends State<OptionsSection> {
     );
   }
 
+  Container showUploadedDocuments() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Text('Documentos subidos', style: AppTextstyles.indexSubtitle, textAlign: TextAlign.center),
+    );
+  }
+
   void showValidateDocumentsScreen() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => ValidateDocumentsScreen(babysitter: widget.person as Babysitter),
+        builder: (context) => ValidateDocumentsScreen(babysitter: widget.person as Babysitter, onDocumentsValidated: (){
+          setState((){
+            (widget.person as Babysitter).isIdentificationSent = true;
+            (widget.person as Babysitter).isStudySent = true;
+            (widget.person as Babysitter).isDomicileSent = true;
+          });
+        },),
       ),
     );
   }
