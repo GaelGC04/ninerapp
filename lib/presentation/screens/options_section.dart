@@ -12,6 +12,7 @@ import 'package:ninerapp/domain/repositories/ibabysitter_repository.dart';
 import 'package:ninerapp/domain/repositories/ichild_repository.dart';
 import 'package:ninerapp/domain/repositories/iparent_repository.dart';
 import 'package:ninerapp/presentation/subscreens/edit_user.dart';
+import 'package:ninerapp/presentation/subscreens/validate_documents_screen.dart';
 import 'package:ninerapp/presentation/widgets/app_button.dart';
 
 class OptionsSection extends StatefulWidget {
@@ -102,10 +103,26 @@ class _OptionsSectionState extends State<OptionsSection> {
           children: [
             const SizedBox(height: 20),
             personalInfo(),
-            if (widget.person is Parent) ...[
+            if (widget.person is Parent == true) ...[
               const SizedBox(height: 20),
               childrenListContent(),
             ],
+            if (widget.person is Babysitter == true) ...[
+              const SizedBox(height: 20),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: AppButton(
+                  onPressed: () => showValidateDocumentsScreen(),
+                  backgroundColor: AppColors.lightGrey,
+                  textColor: AppColors.fontColor,
+                  text: "Subir documentos",
+                  icon: null,
+                  coloredBorder: false
+                ),
+              ),
+            ],
+
             const SizedBox(height: 80),
             AppButton(
               onPressed: () {
@@ -136,6 +153,14 @@ class _OptionsSectionState extends State<OptionsSection> {
             const SizedBox(height: 20),
           ],
         ),
+      ),
+    );
+  }
+
+  void showValidateDocumentsScreen() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ValidateDocumentsScreen(babysitter: widget.person as Babysitter),
       ),
     );
   }
