@@ -33,8 +33,7 @@ class _RequestsSectionState extends State<RequestsSection> {
   String? _errorMessage;
   late bool _showingFinishedServices;
 
-  bool paymentMethodIsCard = false;
-  bool paymentMethodIsCash = false;
+  String? paymentMethod;
   DateTime? initialDate;
   DateTime? finalDate;
   String? statusService;
@@ -56,9 +55,9 @@ class _RequestsSectionState extends State<RequestsSection> {
     try {
       final List<Service> servicesRes;
       if (widget.person is Parent) {
-        servicesRes = await _serviceRepository.getServicesByParentId(widget.person.id!, areFinished, paymentMethodIsCard, paymentMethodIsCash, initialDate, finalDate, statusService);
+        servicesRes = await _serviceRepository.getServicesByParentId(widget.person.id!, areFinished, paymentMethod, initialDate, finalDate, statusService);
       } else {
-        servicesRes = await _serviceRepository.getServicesByBabysitterId(widget.person.id!, areFinished, paymentMethodIsCard, paymentMethodIsCash, initialDate, finalDate, statusService);
+        servicesRes = await _serviceRepository.getServicesByBabysitterId(widget.person.id!, areFinished, paymentMethod, initialDate, finalDate, statusService);
       }
       setState(() {
         servicesList = servicesRes;
@@ -170,8 +169,7 @@ class _RequestsSectionState extends State<RequestsSection> {
       context: context,
       builder: (context) {
         return FilterWindowRequests(
-          paymentMethodIsCard: paymentMethodIsCard,
-          paymentMethodIsCash: paymentMethodIsCash,
+          paymentMethod: paymentMethod,
           initialDate: initialDate,
           finalDate: finalDate,
           statusService: statusService,
@@ -182,14 +180,11 @@ class _RequestsSectionState extends State<RequestsSection> {
 
     if (newFilters != null) {
       setState(() {
-        paymentMethodIsCard = newFilters['paymentMethodIsCard'];
-        paymentMethodIsCash = newFilters['paymentMethodIsCash'];
+        paymentMethod = newFilters['paymentMethod'];
         initialDate = newFilters['initialDate'];
         finalDate = newFilters['finalDate'];
         statusService = newFilters['statusService'];
       });
-
-      print("RESULTADOS:{\n  paymentMethodIsCard: $paymentMethodIsCard,\n  paymentMethodIsCash: $paymentMethodIsCash,\n  initialDate: $initialDate,\n  finalDate: $finalDate,\n  statusService: $statusService\n}");
 
       _loadServices(_showingFinishedServices);
     }

@@ -9,8 +9,7 @@ import 'package:ninerapp/presentation/widgets/app_text_field.dart';
 
 class FilterWindowRequests extends StatefulWidget {
   final String? statusService;
-  final bool? paymentMethodIsCard;
-  final bool? paymentMethodIsCash;
+  final String? paymentMethod;
   final DateTime? initialDate;
   final DateTime? finalDate;
   final bool statusToFilterAreFinished;
@@ -18,8 +17,7 @@ class FilterWindowRequests extends StatefulWidget {
   const FilterWindowRequests({
     super.key,
     required this.statusService,
-    required this.paymentMethodIsCard,
-    required this.paymentMethodIsCash,
+    required this.paymentMethod,
     required this.initialDate,
     required this.finalDate,
     required this.statusToFilterAreFinished,
@@ -32,8 +30,7 @@ class FilterWindowRequests extends StatefulWidget {
 class FilterWindowRequestsState extends State<FilterWindowRequests> {
   late TextEditingController _initialDateController;
   late TextEditingController _finalDateController;
-  late bool _paymentMethodIsCard;
-  late bool _paymentMethodIsCash;
+  late String _paymentMethod;
   late String _statusService;
   String? initialDateText;
   String? finalDateText;
@@ -47,8 +44,7 @@ class FilterWindowRequestsState extends State<FilterWindowRequests> {
     super.initState();
     _initialDateController = TextEditingController(text: widget.initialDate == null ? 'dd/mm/aaaa' :widget.initialDate.toString());
     _finalDateController = TextEditingController(text: widget.finalDate == null ? 'dd/mm/aaaa' :widget.finalDate.toString());
-    _paymentMethodIsCard = widget.paymentMethodIsCard ?? false;
-    _paymentMethodIsCash = widget.paymentMethodIsCash ?? false;
+    _paymentMethod = widget.paymentMethod ?? 'Todos los tipos de pago';
 
     _statusService = widget.statusService ?? 'Todos';
     
@@ -84,8 +80,7 @@ class FilterWindowRequestsState extends State<FilterWindowRequests> {
     Navigator.of(context).pop({
       'initialDate': initialDateText == null ? null : _dateFormat.parse(_initialDateController.text),
       'finalDate': finalDateText == null ? null : _dateFormat.parse(_finalDateController.text),
-      'paymentMethodIsCard': _paymentMethodIsCard,
-      'paymentMethodIsCash': _paymentMethodIsCash,
+      'paymentMethod': _paymentMethod == 'Todos los tipos de pago' ? null : _paymentMethod,
       'statusService': (_statusService == 'Todos los estados finalizados' || _statusService == 'Todos los estados en proceso') ? null : _statusService,
     });
   }
@@ -123,7 +118,7 @@ class FilterWindowRequestsState extends State<FilterWindowRequests> {
                       child: DropdownButton<String>(
                         isExpanded: true,
                         value: statusOptions.contains(_statusService) ? _statusService : null,
-                        hint: const Text("Seleccione un estado"),
+                        hint: const Text("Seleccionar estado"),
                         items: statusOptions.map((String status) {
                           return DropdownMenuItem<String>(
                             value: status,
@@ -147,12 +142,37 @@ class FilterWindowRequestsState extends State<FilterWindowRequests> {
                   const SizedBox(height: 25),
             
                   const Text("Tipo de pago:", style: AppTextstyles.bodyText),
-                  loadCheckbox("Tarjeta", _paymentMethodIsCard, (newValue) {
-                    setState(() => _paymentMethodIsCard = newValue!);
-                  }),
-                  loadCheckbox("Efectivo", _paymentMethodIsCash, (newValue) {
-                    setState(() => _paymentMethodIsCash = newValue!);
-                  }),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        isExpanded: true,
+                        value: statusOptions.contains(_statusService) ? _statusService : null,
+                        hint: const Text("Seleccionar tipo de pago"),
+                        items: statusOptions.map((String status) {
+                          return DropdownMenuItem<String>(
+                            value: status,
+                            child: Text(
+                              status,
+                              style: AppTextstyles.bodyText,
+                            ),
+                          );
+                        }).toList(),
+                        
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            if (newValue != null) {
+                              _statusService = newValue;
+                            }
+                          });
+                        },
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 15),
 
                   const Text("Rango de fechas:", style: AppTextstyles.bodyText),
@@ -271,16 +291,5 @@ class FilterWindowRequestsState extends State<FilterWindowRequests> {
         }
       });
     }
-  }
-
-  Widget loadCheckbox(String title, bool value, ValueChanged<bool?> onChanged) {
-    return CheckboxListTile(
-      title: Text(title, style: AppTextstyles.bodyText.copyWith(color: AppColors.fontColor)),
-      value: value,
-      onChanged: onChanged,
-      controlAffinity: ListTileControlAffinity.leading,
-      activeColor: AppColors.green,
-      contentPadding: EdgeInsets.zero,
-    );
   }
 }
