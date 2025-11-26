@@ -38,15 +38,24 @@ class FilterWindowRequestsState extends State<FilterWindowRequests> {
   final DateFormat _dateFormat = DateFormat('dd-MM-yyyy');
   
   late List<String> statusOptions;
+  final List<String> paymentOptions = [
+    "Todos los tipos de pago",
+    "Con tarjeta",
+    "En efectivo",
+  ];
 
   @override
   void initState() {
     super.initState();
-    _initialDateController = TextEditingController(text: widget.initialDate == null ? 'dd/mm/aaaa' :widget.initialDate.toString());
-    _finalDateController = TextEditingController(text: widget.finalDate == null ? 'dd/mm/aaaa' :widget.finalDate.toString());
+    _initialDateController = TextEditingController(text: widget.initialDate == null ? 'dd/mm/aaaa' : "${TimeNumberFormat.formatTwoDigits(widget.initialDate!.day)}-${TimeNumberFormat.formatTwoDigits(widget.initialDate!.month)}-${TimeNumberFormat.formatTwoDigits(widget.initialDate!.year)}");
+    _finalDateController = TextEditingController(text: widget.finalDate == null ? 'dd/mm/aaaa' : "${TimeNumberFormat.formatTwoDigits(widget.finalDate!.day)}-${TimeNumberFormat.formatTwoDigits(widget.finalDate!.month)}-${TimeNumberFormat.formatTwoDigits(widget.finalDate!.year)}");
+    if (widget.initialDate != null) {
+      initialDateText = "${widget.initialDate!.day}-${widget.initialDate!.month}-${widget.initialDate!.year}";
+    }
+    if (widget.finalDate != null) {
+      finalDateText = "${widget.finalDate!.day}-${widget.finalDate!.month}-${widget.finalDate!.year}";
+    }
     _paymentMethod = widget.paymentMethod ?? 'Todos los tipos de pago';
-
-    _statusService = widget.statusService ?? 'Todos';
     
     List<String> finishedStatusOptions = [
       "Todos los estados finalizados",
@@ -63,8 +72,10 @@ class FilterWindowRequestsState extends State<FilterWindowRequests> {
     ];
 
     if (widget.statusToFilterAreFinished == true) {
+      _statusService = widget.statusService ?? 'Todos los estados finalizados';
       statusOptions = finishedStatusOptions;
     } else {
+      _statusService = widget.statusService ?? 'Todos los estados en proceso';
       statusOptions = processStatusOptions;
     }
   }
@@ -78,8 +89,8 @@ class FilterWindowRequestsState extends State<FilterWindowRequests> {
 
   void applyFilters() {
     Navigator.of(context).pop({
-      'initialDate': initialDateText == null ? null : _dateFormat.parse(_initialDateController.text),
-      'finalDate': finalDateText == null ? null : _dateFormat.parse(_finalDateController.text),
+      'initialDate': initialDateText == null ? null : _dateFormat.parse(_initialDateController.text).copyWith(hour: 0, minute: 0, second: 0),
+      'finalDate': finalDateText == null ? null : _dateFormat.parse(_finalDateController.text).copyWith(hour: 23, minute: 59, second: 59),
       'paymentMethod': _paymentMethod == 'Todos los tipos de pago' ? null : _paymentMethod,
       'statusService': (_statusService == 'Todos los estados finalizados' || _statusService == 'Todos los estados en proceso') ? null : _statusService,
     });
@@ -151,13 +162,13 @@ class FilterWindowRequestsState extends State<FilterWindowRequests> {
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
                         isExpanded: true,
-                        value: statusOptions.contains(_statusService) ? _statusService : null,
+                        value: paymentOptions.contains(_paymentMethod) ? _paymentMethod : null,
                         hint: const Text("Seleccionar tipo de pago"),
-                        items: statusOptions.map((String status) {
+                        items: paymentOptions.map((String payment) {
                           return DropdownMenuItem<String>(
-                            value: status,
+                            value: payment,
                             child: Text(
-                              status,
+                              payment,
                               style: AppTextstyles.bodyText,
                             ),
                           );
@@ -166,7 +177,7 @@ class FilterWindowRequestsState extends State<FilterWindowRequests> {
                         onChanged: (String? newValue) {
                           setState(() {
                             if (newValue != null) {
-                              _statusService = newValue;
+                              _paymentMethod = newValue;
                             }
                           });
                         },

@@ -220,19 +220,36 @@ class ServiceRepository implements IServiceRepository {
           }, []);
         }).toList();
 
+        List<Service> filteredServices = [];
         if (isFinished == true) {
-          final filteredServices = services.where((service) =>
+          filteredServices = services.where((service) =>
             service.status == ServiceStatus.completed.value ||
             service.status == ServiceStatus.rejected.value ||
             service.status == ServiceStatus.canceled.value).toList();
-          return filteredServices;
         } else {
-          final filteredServices = services.where((service) =>
+          filteredServices = services.where((service) =>
             service.status != ServiceStatus.completed.value &&
             service.status != ServiceStatus.rejected.value &&
             service.status != ServiceStatus.canceled.value).toList();
-          return filteredServices;
         }
+
+        if (paymentMethod != null) {
+          filteredServices = filteredServices.where((service) =>
+            service.paymentWithCard == (paymentMethod == 'Con tarjeta')).toList();
+        }
+        if (initialDate != null) {
+          filteredServices = filteredServices.where((service) =>
+            service.date.isAfter(initialDate) || service.date.isAtSameMomentAs(initialDate)).toList();
+        }
+        if (finalDate != null) {
+          filteredServices = filteredServices.where((service) =>
+            service.date.isBefore(finalDate) || service.date.isAtSameMomentAs(finalDate)).toList();
+        }
+        if (statusService != null) {
+          filteredServices = filteredServices.where((service) =>
+            service.status == statusService).toList();
+        }
+        return filteredServices;
     } on PostgrestException catch (e) {
       throw Exception('Error al obtener servicios: ${e.message}');
     } catch (e) {
@@ -259,19 +276,36 @@ class ServiceRepository implements IServiceRepository {
           }, []);
         }).toList();
 
+        List<Service> filteredServices = [];
         if (isFinished == true) {
-          final filteredServices = services.where((service) =>
+          filteredServices = services.where((service) =>
             service.status == ServiceStatus.completed.value ||
             service.status == ServiceStatus.rejected.value ||
             service.status == ServiceStatus.canceled.value).toList();
-          return filteredServices;
         } else {
-          final filteredServices = services.where((service) =>
+          filteredServices = services.where((service) =>
             service.status != ServiceStatus.completed.value &&
             service.status != ServiceStatus.rejected.value &&
             service.status != ServiceStatus.canceled.value).toList();
-          return filteredServices;
         }
+
+        if (paymentMethod != null) {
+          filteredServices = filteredServices.where((service) =>
+            service.paymentWithCard == (paymentMethod == 'Con tarjeta')).toList();
+        }
+        if (initialDate != null) {
+          filteredServices = filteredServices.where((service) =>
+            service.date.isAfter(initialDate) || service.date.isAtSameMomentAs(initialDate)).toList();
+        }
+        if (finalDate != null) {
+          filteredServices = filteredServices.where((service) =>
+            service.date.isBefore(finalDate) || service.date.isAtSameMomentAs(finalDate)).toList();
+        }
+        if (statusService != null) {
+          filteredServices = filteredServices.where((service) =>
+            service.status == statusService).toList();
+        }
+        return filteredServices;
     } on PostgrestException catch (e) {
       throw Exception('Error al obtener servicios: ${e.message}');
     } catch (e) {

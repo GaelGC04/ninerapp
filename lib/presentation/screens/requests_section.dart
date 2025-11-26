@@ -88,6 +88,9 @@ class _RequestsSectionState extends State<RequestsSection> {
       ),
       body: Column(
         children: [
+          if (widget.person is Babysitter) ...[
+            buttonsBar(),
+          ],
           if (_isLoading)
             Expanded(child: Center(child: CircularProgressIndicator(color: AppColors.primary)))
           else if (_errorMessage != null)
@@ -100,9 +103,6 @@ class _RequestsSectionState extends State<RequestsSection> {
               ),
             ),
           ] else ... [
-            if (widget.person is Babysitter) ...[
-              buttonsBar(),
-            ],
             Expanded(
               child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
