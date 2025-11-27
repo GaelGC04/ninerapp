@@ -7,21 +7,21 @@ import 'package:ninerapp/domain/entities/babysitter.dart';
 import 'package:ninerapp/domain/repositories/ibabysitter_repository.dart';
 import 'package:ninerapp/presentation/widgets/app_button.dart';
 
-class ValidateDocumentsScreen extends StatefulWidget {
+class UploadDocumentsScreen extends StatefulWidget {
   final Babysitter babysitter;
-  final VoidCallback onDocumentsValidated;
+  final VoidCallback onDocumentsUploaded;
 
-  const ValidateDocumentsScreen({
+  const UploadDocumentsScreen({
     super.key,
     required this.babysitter,
-    required this.onDocumentsValidated,
+    required this.onDocumentsUploaded,
   });
 
   @override
-  State<ValidateDocumentsScreen> createState() => _ValidateDocumentsScreenState();
+  State<UploadDocumentsScreen> createState() => _UploadDocumentsScreenState();
 }
 
-class _ValidateDocumentsScreenState extends State<ValidateDocumentsScreen> {
+class _UploadDocumentsScreenState extends State<UploadDocumentsScreen> {
   final IBabysitterRepository _babysitterRepository = getIt<IBabysitterRepository>();
   bool identificationSelected = false;
   bool studySelected = false;
@@ -144,13 +144,18 @@ class _ValidateDocumentsScreenState extends State<ValidateDocumentsScreen> {
     );
   }
 
-  Future<void> _pickFile(String documentType) async {
+  Future<void> pickFile(String documentType) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['jpg', 'jpeg', 'png'],
     );
 
     if (result != null) {
+      if (!result.files.single.name.endsWith("jpg")
+      && !result.files.single.name.endsWith("jpeg")
+      && !result.files.single.name.endsWith("png")) {
+        return;
+      }
       setState(() {
         switch (documentType) {
           case "identification":
@@ -167,7 +172,7 @@ class _ValidateDocumentsScreenState extends State<ValidateDocumentsScreen> {
     }
   }
 
-  void validateBabysitterIdentificationDoc() async {
+  void uploadBabysitterIdentificationDoc() async {
     bool result = await _babysitterRepository.updateBabysitterDocuments(widget.babysitter, "identification");
     if (result == false) {
       if (mounted) {
@@ -187,13 +192,13 @@ class _ValidateDocumentsScreenState extends State<ValidateDocumentsScreen> {
       if (widget.babysitter.isIdentificationSent == true
         && widget.babysitter.isStudySent == true
         && widget.babysitter.isDomicileSent == true) {
-        widget.onDocumentsValidated();
+        widget.onDocumentsUploaded();
         Navigator.pop(context);
       }
     }
   }
 
-  void validateBabysitterStudyDoc() async {
+  void uploadBabysitterStudyDoc() async {
     bool result = await _babysitterRepository.updateBabysitterDocuments(widget.babysitter, "study");
     if (result == false) {
       if (mounted) {
@@ -213,13 +218,13 @@ class _ValidateDocumentsScreenState extends State<ValidateDocumentsScreen> {
       if (widget.babysitter.isIdentificationSent == true
         && widget.babysitter.isStudySent == true
         && widget.babysitter.isDomicileSent == true) {
-        widget.onDocumentsValidated();
+        widget.onDocumentsUploaded();
         Navigator.pop(context);
       }
     }
   }
 
-  void validateBabysitterDomicileDoc() async {
+  void uploadBabysitterDomicileDoc() async {
     bool result = await _babysitterRepository.updateBabysitterDocuments(widget.babysitter, "domicile");
     if (result == false) {
       if (mounted) {
@@ -239,7 +244,7 @@ class _ValidateDocumentsScreenState extends State<ValidateDocumentsScreen> {
       if (widget.babysitter.isIdentificationSent == true
         && widget.babysitter.isStudySent == true
         && widget.babysitter.isDomicileSent == true) {
-        widget.onDocumentsValidated();
+        widget.onDocumentsUploaded();
         Navigator.pop(context);
       }
     }
@@ -251,7 +256,7 @@ class _ValidateDocumentsScreenState extends State<ValidateDocumentsScreen> {
         SizedBox(
           width: double.infinity,
           child: AppButton(
-            onPressed: () => _pickFile("domicile"),
+            onPressed: () => pickFile("domicile"),
             backgroundColor: AppColors.lightGrey,
             textColor: AppColors.fontColor,
             text: domicileSelected == false ? "Adjuntar comprobante de domicilio" : "Comprobante de domicilio seleccionado",
@@ -261,7 +266,7 @@ class _ValidateDocumentsScreenState extends State<ValidateDocumentsScreen> {
         ),
         const SizedBox(height: 20),
         AppButton(
-          onPressed: validateBabysitterDomicileDoc,
+          onPressed: uploadBabysitterDomicileDoc,
           backgroundColor: AppColors.currentSectionColor,
           textColor: AppColors.lightGrey,
           text: "Subir comprobante de domicilio",
@@ -279,7 +284,7 @@ class _ValidateDocumentsScreenState extends State<ValidateDocumentsScreen> {
         SizedBox(
           width: double.infinity,
           child: AppButton(
-            onPressed: () => _pickFile("study"),
+            onPressed: () => pickFile("study"),
             backgroundColor: AppColors.lightGrey,
             textColor: AppColors.fontColor,
             text: studySelected == false ? "Adjuntar comprobante de estudios" : "Comprobante de estudios seleccionado",
@@ -289,7 +294,7 @@ class _ValidateDocumentsScreenState extends State<ValidateDocumentsScreen> {
         ),
         const SizedBox(height: 20),
         AppButton(
-          onPressed: validateBabysitterStudyDoc,
+          onPressed: uploadBabysitterStudyDoc,
           backgroundColor: AppColors.currentSectionColor,
           textColor: AppColors.lightGrey,
           text: "Subir comprobante de estudios",
@@ -308,7 +313,7 @@ class _ValidateDocumentsScreenState extends State<ValidateDocumentsScreen> {
         SizedBox(
           width: double.infinity,
           child: AppButton(
-            onPressed: () => _pickFile("identification"),
+            onPressed: () => pickFile("identification"),
             backgroundColor: AppColors.lightGrey,
             textColor: AppColors.fontColor,
             text: identificationSelected == false ? "Adjuntar identificación oficial" : "Identificación oficial seleccionada",
@@ -318,7 +323,7 @@ class _ValidateDocumentsScreenState extends State<ValidateDocumentsScreen> {
         ),
         const SizedBox(height: 20),
         AppButton(
-          onPressed: validateBabysitterIdentificationDoc,
+          onPressed: uploadBabysitterIdentificationDoc,
           backgroundColor: AppColors.currentSectionColor,
           textColor: AppColors.lightGrey,
           text: "Subir identificación oficial",

@@ -12,7 +12,7 @@ import 'package:ninerapp/domain/repositories/ibabysitter_repository.dart';
 import 'package:ninerapp/domain/repositories/ichild_repository.dart';
 import 'package:ninerapp/domain/repositories/iparent_repository.dart';
 import 'package:ninerapp/presentation/subscreens/edit_user.dart';
-import 'package:ninerapp/presentation/subscreens/validate_documents_screen.dart';
+import 'package:ninerapp/presentation/subscreens/upload_documents_screen.dart';
 import 'package:ninerapp/presentation/widgets/app_button.dart';
 
 class OptionsSection extends StatefulWidget {
@@ -118,7 +118,7 @@ class _OptionsSectionState extends State<OptionsSection> {
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: AppButton(
-                    onPressed: () => showValidateDocumentsScreen(),
+                    onPressed: () => showUploadDocumentsScreen(),
                     backgroundColor: AppColors.lightGrey,
                     textColor: AppColors.fontColor,
                     text: "Subir documentos",
@@ -171,10 +171,10 @@ class _OptionsSectionState extends State<OptionsSection> {
     );
   }
 
-  void showValidateDocumentsScreen() {
+  void showUploadDocumentsScreen() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => ValidateDocumentsScreen(babysitter: widget.person as Babysitter, onDocumentsValidated: (){
+        builder: (context) => UploadDocumentsScreen(babysitter: widget.person as Babysitter, onDocumentsUploaded: (){
           setState((){
             (widget.person as Babysitter).isIdentificationSent = true;
             (widget.person as Babysitter).isStudySent = true;
