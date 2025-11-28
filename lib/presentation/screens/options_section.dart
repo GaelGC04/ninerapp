@@ -98,72 +98,80 @@ class _OptionsSectionState extends State<OptionsSection> {
         centerTitle: false,
         backgroundColor: AppColors.primary,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-            personalInfo(),
-            if (widget.person is Parent == true) ...[
-              const SizedBox(height: 20),
-              childrenListContent(),
-            ],
-            if (widget.person is Babysitter == true) ...[
-              const SizedBox(height: 30),
-              if ((widget.person as Babysitter).isIdentificationSent == true
-              && (widget.person as Babysitter).isStudySent == true
-              && (widget.person as Babysitter).isDomicileSent == true) ...[
-                showUploadedDocuments(),
-              ] else ...[
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: AppButton(
-                    onPressed: () => showUploadDocumentsScreen(),
-                    backgroundColor: AppColors.lightGrey,
-                    textColor: AppColors.fontColor,
-                    text: "Subir documentos",
-                    icon: null,
-                    coloredBorder: false
-                  ),
-                ),
-              ],
-            ],
+      body: showOptionsSection(),
+    );
+  }
 
-            const SizedBox(height: 80),
-            AppButton(
-              onPressed: () {
-                widget.onSessionClosed();
-              },
-              backgroundColor: AppColors.lightGrey,
-              textColor: AppColors.fontColor,
-              text: "Cerrar sesión",
-              icon: FontAwesomeIcons.rightFromBracket,
-              coloredBorder: false
-            ),
-            const SizedBox(height: 14),
-            AppButton(
-              onPressed: () {
-                if (widget.person is Parent) {
-                  _parentRepository.deleteParent(_parent!.id!);
-                } else if (widget.person is Babysitter) {
-                  _babysitterRepository.deleteBabysitter(_babysitter!.id!);
-                }
-                widget.onSessionClosed();
-              },
-              backgroundColor: AppColors.historyColor,
-              textColor: AppColors.fontColor,
-              text: "Eliminar cuenta",
-              icon: FontAwesomeIcons.trash,
-              coloredBorder: false
-            ),
+  SingleChildScrollView showOptionsSection() {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          const SizedBox(height: 20),
+          personalInfo(),
+          if (widget.person is Parent == true) ...[
             const SizedBox(height: 20),
+            childrenListContent(),
           ],
-        ),
+          if (widget.person is Babysitter == true) ...[
+            const SizedBox(height: 30),
+            if ((widget.person as Babysitter).isIdentificationSent == true
+            && (widget.person as Babysitter).isStudySent == true
+            && (widget.person as Babysitter).isDomicileSent == true) ...[
+              showDocumentsUploadedMessage(),
+            ] else ...[
+              showUploadDocumentsButton(),
+            ],
+          ],
+
+          const SizedBox(height: 80),
+          AppButton(
+            onPressed: () {
+              widget.onSessionClosed();
+            },
+            backgroundColor: AppColors.lightGrey,
+            textColor: AppColors.fontColor,
+            text: "Cerrar sesión",
+            icon: FontAwesomeIcons.rightFromBracket,
+            coloredBorder: false
+          ),
+          const SizedBox(height: 14),
+          AppButton(
+            onPressed: () {
+              if (widget.person is Parent) {
+                _parentRepository.deleteParent(_parent!.id!);
+              } else if (widget.person is Babysitter) {
+                _babysitterRepository.deleteBabysitter(_babysitter!.id!);
+              }
+              widget.onSessionClosed();
+            },
+            backgroundColor: AppColors.historyColor,
+            textColor: AppColors.fontColor,
+            text: "Eliminar cuenta",
+            icon: FontAwesomeIcons.trash,
+            coloredBorder: false
+          ),
+          const SizedBox(height: 20),
+        ],
       ),
     );
   }
 
-  Container showUploadedDocuments() {
+  Container showUploadDocumentsButton() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: AppButton(
+        onPressed: () => showUploadDocumentsScreen(),
+        backgroundColor: AppColors.lightGrey,
+        textColor: AppColors.fontColor,
+        text: "Subir documentos",
+        icon: null,
+        coloredBorder: false
+      ),
+    );
+  }
+
+  Container showDocumentsUploadedMessage() {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 20),

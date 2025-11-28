@@ -113,12 +113,12 @@ class _ServiceInfoScreenState extends State<ServiceInfoScreen> {
           backgroundColor: AppColors.primary,
           title: const Text("Datos de solicitud", style: AppTextstyles.appBarText),
         ),
-        body: showServiceInfo(context),
+        body: openServiceInfo(context),
       ),
     );
   }
 
-  Padding showServiceInfo(BuildContext context) {
+  Padding openServiceInfo(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: SingleChildScrollView(
@@ -355,8 +355,26 @@ class _ServiceInfoScreenState extends State<ServiceInfoScreen> {
                 Tooltip(
                   message: "${starsIterator + 1} Estrellas",
                   child: IconButton(
-                    onPressed: (){
-                      rateUser(starsIterator + 1);
+                    onPressed: () async {
+                      bool result = await _serviceRepository.updateUserRate(widget.service, widget.person is Parent == true, starsIterator + 1);
+                      if (result == false) {
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Ha ocurrido un error al enviar la calificación, intentar de nuevo más tarde', style: TextStyle(color: AppColors.white)),
+                              backgroundColor: AppColors.red,
+                            ),
+                          );
+                        }
+                        return;
+                      }
+                      setState(() {
+                        if (widget.person is Parent) {
+                          serviceUpdated.ratedByParent = true;
+                        } else if (widget.person is Babysitter) {
+                          serviceUpdated.ratedByBabysitter = true;
+                        }
+                      });
                     },
                     icon: Icon(FontAwesomeIcons.solidStar),
                     color: AppColors.green,
@@ -380,28 +398,6 @@ class _ServiceInfoScreenState extends State<ServiceInfoScreen> {
       width: double.infinity,
       child: Text("Ya has calificado a ${widget.person is Parent == true ? "${widget.babysitter.name} ${widget.babysitter.lastName}" : "${widget.parent.name} ${widget.parent.lastName}"} en este servicio", style: TextStyle(color: AppColors.green), textAlign: TextAlign.center),
     );
-  }
-
-  void rateUser(int starsAmount) async {
-    bool result = await _serviceRepository.updateUserRate(widget.service, widget.person is Parent == true, starsAmount);
-    if (result == false) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Ha ocurrido un error al enviar la calificación, intentar de nuevo más tarde', style: TextStyle(color: AppColors.white)),
-            backgroundColor: AppColors.red,
-          ),
-        );
-      }
-      return;
-    }
-    setState(() {
-      if (widget.person is Parent) {
-        serviceUpdated.ratedByParent = true;
-      } else if (widget.person is Babysitter) {
-        serviceUpdated.ratedByBabysitter = true;
-      }
-    });
   }
 
   AppButton showReportSection() {
