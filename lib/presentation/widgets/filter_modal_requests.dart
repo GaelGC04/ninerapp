@@ -141,11 +141,7 @@ class FilterWindowRequestsState extends State<FilterWindowRequests> {
                         }).toList(),
                         
                         onChanged: (String? newValue) {
-                          setState(() {
-                            if (newValue != null) {
-                              _statusService = newValue;
-                            }
-                          });
+                          setStatusFilter(newValue);
                         },
                       ),
                     ),
@@ -175,11 +171,7 @@ class FilterWindowRequestsState extends State<FilterWindowRequests> {
                         }).toList(),
                         
                         onChanged: (String? newValue) {
-                          setState(() {
-                            if (newValue != null) {
-                              _paymentMethod = newValue;
-                            }
-                          });
+                          setPaymentMethodFilter(newValue);
                         },
                       ),
                     ),
@@ -224,6 +216,22 @@ class FilterWindowRequestsState extends State<FilterWindowRequests> {
     );
   }
 
+  void setPaymentMethodFilter(String? newPaymentMethod) {
+    setState(() {
+      if (newPaymentMethod != null) {
+        _paymentMethod = newPaymentMethod;
+      }
+    });
+  }
+
+  void setStatusFilter(String? newStatus) {
+    setState(() {
+      if (newStatus != null) {
+        _statusService = newStatus;
+      }
+    });
+  }
+
   void hideFiltersWindow() {
     Navigator.of(context).pop();
   }
@@ -233,7 +241,7 @@ class FilterWindowRequestsState extends State<FilterWindowRequests> {
       children: [
         Expanded(
           child: GestureDetector(
-            onTap: () => _selectDate(context, true),
+            onTap: () => selectDate(context, true),
             child: AbsorbPointer(
               child: AppTextField(
                 controller: minController,
@@ -248,7 +256,7 @@ class FilterWindowRequestsState extends State<FilterWindowRequests> {
         const SizedBox(width: 20),
         Expanded(
           child: GestureDetector(
-            onTap: () => _selectDate(context, false),
+            onTap: () => selectDate(context, false),
             child: AbsorbPointer(
               child: AppTextField(
                 controller: maxController,
@@ -262,7 +270,7 @@ class FilterWindowRequestsState extends State<FilterWindowRequests> {
     );
   }
 
-  void _validateMaxDate() {
+  void setInitialAndFinalDateEqual() {
     if (_finalDateController.text.isNotEmpty && _initialDateController.text.isNotEmpty) {
       try {
         DateTime minDate = _dateFormat.parse(_initialDateController.text);
@@ -280,7 +288,7 @@ class FilterWindowRequestsState extends State<FilterWindowRequests> {
     }
   }
 
-  Future<void> _selectDate(BuildContext context, bool isInitial) async {
+  Future<void> selectDate(BuildContext context, bool isInitial) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -292,12 +300,12 @@ class FilterWindowRequestsState extends State<FilterWindowRequests> {
         if (isInitial == true) {
           _initialDateController.text = "${TimeNumberFormat.formatTwoDigits(picked.day)}-${TimeNumberFormat.formatTwoDigits(picked.month)}-${picked.year}";
           initialDateText = "${picked.day}-${picked.month}-${picked.year}";
-          _validateMaxDate();
+          setInitialAndFinalDateEqual();
           return;
         } else {
           _finalDateController.text = "${TimeNumberFormat.formatTwoDigits(picked.day)}-${TimeNumberFormat.formatTwoDigits(picked.month)}-${picked.year}";
           finalDateText = "${picked.day}-${picked.month}-${picked.year}";
-          _validateMaxDate();
+          setInitialAndFinalDateEqual();
           return;
         }
       });

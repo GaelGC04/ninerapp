@@ -154,7 +154,7 @@ class _RequestsSectionState extends State<RequestsSection> {
               borderRadius: BorderRadius.circular(10),
             ),
             child: IconButton(
-              onPressed: openFiltersWindow,
+              onPressed: showFiltersWindow,
               icon: Icon(FontAwesomeIcons.filter), color: AppColors.currentListOption,
               style: ButtonStyle(overlayColor: WidgetStateProperty.all(AppColors.invisible))
             )
@@ -164,7 +164,7 @@ class _RequestsSectionState extends State<RequestsSection> {
     );
   }
 
-  Future<void> openFiltersWindow() async {
+  Future<void> showFiltersWindow() async {
     final Map<String, dynamic>? newFilters = await showDialog(
       context: context,
       builder: (context) {
